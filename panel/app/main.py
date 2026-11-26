@@ -1050,6 +1050,7 @@ def devices(req: Request):
         hwch = {r[0]: r[1] for r in c.execute("select id, max(ts) from hw_history where ts>? group by id", (now() - 14 * 86400,))}
     peers = hbbs_peers(); t = now(); res = []
     seen = seen_map(r["id"] for r in rows)
+    isp = isp_on() and bool(ISP["orgs"])
     for r in rows:
         if seen.get(r["id"], 0) > (r["last_seen"] or 0): r["last_seen"] = seen[r["id"]]
         r["has_password"] = bool(r.pop("password")); r["online"] = bool(r["last_seen"] and t - r["last_seen"] < ONLINE_SEC)
@@ -1061,6 +1062,9 @@ def devices(req: Request):
         r["groups"] = dg.get(r["id"], [])
         lu = str(r.get("logged_user") or ""); dom = lu.split("\\")[0] if "\\" in lu else ""
         r["domain"] = dom if dom and dom.lower() != str(r.get("hostname") or "").lower() else ""
+        if isp:
+            lip = r.get("last_ip") or ""
+            r["isp"] = isp_name(r.get("ext_ip") or ("" if is_private(lip) else lip))
         # результат последней команды показываем ограниченное время: «выключается/перезагружается» — 10 мин
         # (дальше это уже не новость), остальное (обновление, ошибка, отмена) — сутки; в базе он остаётся
         if r.get("cmd_result") and not r.get("cmd"):
@@ -1214,6 +1218,98 @@ def ip_ok(v):
 def is_private(ip):
     try: a = ipaddress.ip_address(ip); return a.is_private or a.is_loopback or a.is_link_local
     except ValueError: return False
+
+# ---------------------------------------------------------------- провайдер по внешнему IP (тумблер isp_lookup)
+# Офлайн-база DB-IP «IP to ASN Lite» (CC BY 4.0, https://db-ip.com): панель скачивает её раз в месяц в PANEL_DIR/isp,
+# без интернета работает последняя скачанная. IP клиентов во внешние сервисы не отправляются.
+from array import array
+import bisect, csv, gzip
+ISP_DIR = D / "isp"
+ISP = {"v4s": array("L"), "v4e": array("L"), "v4o": array("I"), "v6s": [], "v6e": [], "v6o": array("I"), "orgs": [],
+       "file": "", "err": "", "busy": False, "at": 0}
+_ISP_CACHE = {}
+
+def isp_on(): return setting("isp_lookup", "0") == "1"
+
+def _isp_load(path):
+    rows4, rows6, orgs, idx = [], [], [], {}
+    with gzip.open(path, "rt", encoding="utf-8", newline="") as f:
+        for row in csv.reader(f):
+            if len(row) < 4: continue
+            org, asn = (row[3] or "").strip(), (row[2] or "").strip()
+            label = f"{org} (AS{asn})" if org and asn and asn != "0" else (org or (f"AS{asn}" if asn and asn != "0" else ""))
+            if not label: continue
+            k = idx.get(label)
+            if k is None: k = idx[label] = len(orgs); orgs.append(label)
+            try: a, b = ipaddress.ip_address(row[0]), ipaddress.ip_address(row[1])
+            except ValueError: continue
+            (rows4 if a.version == 4 else rows6).append((int(a), int(b), k))
+    rows4.sort(); rows6.sort()
+    ISP.update(v4s=array("L", (r[0] for r in rows4)), v4e=array("L", (r[1] for r in rows4)), v4o=array("I", (r[2] for r in rows4)),
+               v6s=[r[0] for r in rows6], v6e=[r[1] for r in rows6], v6o=array("I", (r[2] for r in rows6)),
+               orgs=orgs, file=path.name, err="", at=int(time.time()))
+    _ISP_CACHE.clear()
+    print(f"[isp] база {path.name}: IPv4 {len(rows4)}, IPv6 {len(rows6)}, провайдеров {len(orgs)}", flush=True)
+
+def isp_name(ip):
+    """Провайдер (организация и номер AS) по IP; частный адрес — «локальная сеть»; нет базы или адреса — ''."""
+    ip = ip_ok(ip or "")
+    if not ip: return ""
+    if is_private(ip): return "локальная сеть"
+    if not ISP["orgs"]: return ""
+    r = _ISP_CACHE.get(ip)
+    if r is not None: return r
+    a = ipaddress.ip_address(ip); n = int(a)
+    s, e, o = (ISP["v4s"], ISP["v4e"], ISP["v4o"]) if a.version == 4 else (ISP["v6s"], ISP["v6e"], ISP["v6o"])
+    i = bisect.bisect_right(s, n) - 1
+    r = ISP["orgs"][o[i]] if i >= 0 and n <= e[i] else ""
+    if len(_ISP_CACHE) > 50000: _ISP_CACHE.clear()
+    _ISP_CACHE[ip] = r
+    return r
+
+def _isp_fetch():
+    ISP_DIR.mkdir(parents=True, exist_ok=True)
+    t = time.gmtime(); prev = (t.tm_year - 1, 12) if t.tm_mon == 1 else (t.tm_year, t.tm_mon - 1)
+    for y, m in ((t.tm_year, t.tm_mon), prev):
+        name = f"dbip-asn-lite-{y}-{m:02d}.csv.gz"
+        if (ISP_DIR / name).exists(): return ISP_DIR / name
+        tmp = ISP_DIR / (name + ".tmp")
+        try:
+            fetch(f"https://download.db-ip.com/free/{name}", tmp, timeout=300)
+            with gzip.open(tmp, "rt", encoding="utf-8") as g:
+                if "," not in g.readline(): raise ValueError("не CSV")
+            tmp.rename(ISP_DIR / name)
+            for old in ISP_DIR.glob("dbip-asn-lite-*.csv.gz"):
+                if old.name != name: old.unlink()
+            return ISP_DIR / name
+        except Exception as ex:
+            ISP["err"] = f"не удалось скачать базу провайдеров: {type(ex).__name__}"
+            tmp.unlink(missing_ok=True)
+    return None
+
+def isp_refresh(force=False):
+    if ISP["busy"]: return
+    ISP["busy"] = True
+    try:
+        have = sorted(ISP_DIR.glob("dbip-asn-lite-*.csv.gz")) if ISP_DIR.exists() else []
+        cur = have[-1] if have else None
+        if force or not cur or time.time() - cur.stat().st_mtime > 32 * 86400:
+            cur = _isp_fetch() or cur
+        if cur and (cur.name != ISP["file"] or not ISP["orgs"]): _isp_load(cur)
+    except Exception as ex:
+        ISP["err"] = f"{type(ex).__name__}: {str(ex)[:150]}"
+    finally:
+        ISP["busy"] = False
+
+def _isp_loop():
+    time.sleep(5)
+    while True:
+        try:
+            if isp_on(): isp_refresh()
+        except Exception as ex: print("[isp]", type(ex).__name__, ex, flush=True)
+        time.sleep(6 * 3600)
+
+if not E("RDS_NO_BUILDER"): threading.Thread(target=_isp_loop, daemon=True).start()
 
 def home_ip():
     """Внешний IP нашей сети (env HOME_IP или A-запись RDS_HOST, кеш 1 ч)."""
@@ -1542,7 +1638,9 @@ def device_hw(i: str, req: Request):
     except ValueError: sc = []
     try: av = json.loads(d.get("antivirus") or "[]")
     except ValueError: av = []
-    return {"id": i, "hostname": d.get("hostname") or "", "os": d.get("os") or "",
+    lip = d.get("last_ip") or ""
+    return {"id": i, "isp": isp_name(d.get("ext_ip") or ("" if is_private(lip) else lip)) if isp_on() else "",
+            "hostname": d.get("hostname") or "", "os": d.get("os") or "",
             "cpu": cpu_line(d.get("hw_cpu") or d.get("cpu") or "", d.get("cpu_cores"), d.get("cpu_threads")), "gpu": gpu_with_mem(d.get("gpu") or "", d.get("gpu_mem") or ""), "board": d.get("board") or "", "ram": (d.get("hw_ram") or d.get("memory") or "") + (f" ({d['ram_type']})" if d.get("ram_type") and (d.get("hw_ram") or d.get("memory")) else ""),
             "disk": d.get("disk") or "", "nic": short_nic_line(d.get("nic") or ""), "mac": d.get("mac") or "", "local_ip": d.get("local_ip") or "",
             "ext_ip": d.get("ext_ip") or "", "users": d.get("pc_users") or "", "logged_user": d.get("logged_user") or "",
@@ -2164,7 +2262,8 @@ def _settings_out():
     return {"direct_connect": setting("direct_connect", "1") == "1", "pwr_shutdown_delay": pc["shutdown_delay"],
             "pwr_reboot_delay": pc["reboot_delay"], "pwr_message": pc["message"], "pwr_default_message": PWR_DEF_MSG,
             "agent_key_strict": agent_strict(), "agents_unbound": _agents_unbound(),
-            "admin_2fa_required": setting("admin_2fa_required", "0") == "1", "ad_approval": setting("ad_approval", "0") == "1", **backup_cfg()}
+            "admin_2fa_required": setting("admin_2fa_required", "0") == "1", "ad_approval": setting("ad_approval", "0") == "1",
+            "isp_lookup": isp_on(), "isp_db": ISP["file"], "isp_err": ISP["err"], "isp_busy": ISP["busy"], **backup_cfg()}
 
 # ---------------------------------------------------------------- резервные копии базы (делает служба rds-pg-backup на хосте, настройки — здесь)
 BACKUP_DIR = Path("/data/backup")
@@ -2357,6 +2456,10 @@ async def admin_settings_set(req: Request):
     if "ad_approval" in j:
         with db() as c: c.execute("insert into settings(k, v) values('ad_approval', ?) on conflict(k) do update set v=excluded.v",
                                   ("1" if j.get("ad_approval") else "0",))
+    if "isp_lookup" in j:
+        with db() as c: c.execute("insert into settings(k, v) values('isp_lookup', ?) on conflict(k) do update set v=excluded.v",
+                                  ("1" if j.get("isp_lookup") else "0",))
+        if j.get("isp_lookup"): threading.Thread(target=isp_refresh, daemon=True).start()
     if "agent_key_strict" in j:
         with db() as c: c.execute("insert into settings(k, v) values('agent_key_strict', ?) on conflict(k) do update set v=excluded.v",
                                   ("1" if j.get("agent_key_strict") else "0",))

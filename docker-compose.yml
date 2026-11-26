@@ -57,7 +57,7 @@ services:
     restart: unless-stopped
 
   panel:
-    image: ${PANEL_IMAGE:-scposs/rds-panel:1.0.1}
+    image: ${PANEL_IMAGE:-scposs/rds-panel:1.0.2}
     container_name: rds-panel
     environment:
       - RDS_HOST=${RDS_HOST}

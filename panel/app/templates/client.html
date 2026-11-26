@@ -520,7 +520,10 @@
   const plat = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '').toLowerCase();
 
   let detectedOS = 'other';
-  if (ua.includes('win') || plat.includes('win')) detectedOS = 'windows';
+  // телефоны — первыми: в UA iPhone есть «Mac OS X», в UA Android — «Linux»; iPad в режиме «как Mac» узнаём по сенсорному экрану
+  if (/iphone|ipad|ipod/.test(ua) || ((ua.includes('mac') || plat.includes('mac')) && (navigator.maxTouchPoints || 0) > 1)) detectedOS = 'ios';
+  else if (ua.includes('android')) detectedOS = 'android';
+  else if (ua.includes('win') || plat.includes('win')) detectedOS = 'windows';
   else if (ua.includes('mac') || plat.includes('mac')) detectedOS = 'macos';
   else if (ua.includes('linux') || plat.includes('linux')) detectedOS = 'linux';
 
@@ -584,6 +587,22 @@
       },
       enabled: true,
       icon: osIcons.macos
+    },
+    ios: {
+      href: function() { return 'https://apps.apple.com/app/id1581225015'; },
+      text: 'RustDesk для iPhone и iPad',
+      hint: 'Установите <b>RustDesk Remote Desktop</b> из App Store. С iPhone и iPad можно подключаться к компьютерам, но управлять самим телефоном нельзя. В приложении: Настройки → «ID/Ретранслятор сервер» — впишите ID-сервер и ключ из раздела «Настройки сервера» ниже. Чтобы установить RustDesk на компьютер, выберите систему в списке «Другая система».',
+      cmd: function() { return `<div class="cmd-block center">На телефоне команды не нужны — настройте сервер в приложении</div>`; },
+      enabled: true,
+      icon: ''
+    },
+    android: {
+      href: function() { return 'https://github.com/rustdesk/rustdesk/releases/latest'; },
+      text: 'RustDesk для Android',
+      hint: 'Скачайте <b>rustdesk-…-universal.apk</b> со страницы последнего выпуска (или установите RustDesk из Google Play / F-Droid). В приложении: ⋮ → «ID/Ретранслятор сервер» — впишите ID-сервер и ключ из раздела «Настройки сервера» ниже. Чтобы установить RustDesk на компьютер, выберите систему в списке «Другая система».',
+      cmd: function() { return `<div class="cmd-block center">На телефоне команды не нужны — настройте сервер в приложении</div>`; },
+      enabled: true,
+      icon: ''
     },
     other: {
       href: function() { return '#'; },
