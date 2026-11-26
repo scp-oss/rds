@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="alternate icon" href="/favicon.ico"><title>Удалённая помощь — RustDesk</title>
+<style>
+  :root {
+    --bg: #f3f7fd;
+    --bg-2: #e6eefc;
+    --text: #0a1224;
+    --text-dim: #5c6c86;
+    --text-faint: #93a1ba;
+    --accent-1: #2563eb;
+    --accent-2: #3b82f6;
+    --accent-3: #60a5fa;
+    --accent-soft: rgba(37, 99, 235, 0.09);
+    --hairline: rgba(15, 24, 45, 0.10);
+    --surface: rgba(255, 255, 255, 0.55);
+    --surface-hover: rgba(255, 255, 255, 0.85);
+    --glow: rgba(37, 99, 235, 0.5);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #050810;
+      --bg-2: #0a0f1e;
+      --text: #eef2fc;
+      --text-dim: #8b98b8;
+      --text-faint: #57628080;
+      --accent-1: #3b82f6;
+      --accent-2: #5b9bff;
+      --accent-3: #8ebbff;
+      --accent-soft: rgba(59, 130, 246, 0.16);
+      --hairline: rgba(180, 200, 255, 0.12);
+      --surface: rgba(255, 255, 255, 0.045);
+      --surface-hover: rgba(255, 255, 255, 0.09);
+      --glow: rgba(59, 130, 246, 0.55);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    padding: 64px 22px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+
+  /* ---------- ambient field, no framed panel ---------- */
+  .field {
+    position: fixed;
+    inset: -60px;
+    z-index: 0;
+    overflow: hidden;
+    background: radial-gradient(1100px 760px at 50% -8%, var(--bg-2), transparent 60%), var(--bg);
+    will-change: transform;
+    transition: transform 0.9s cubic-bezier(.16,1,.3,1);
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    will-change: transform;
+  }
+  .orb-1 {
+    width: 44vw; height: 44vw; max-width: 640px; max-height: 640px;
+    top: -18%; left: -14%;
+    background: radial-gradient(circle at 35% 35%, var(--accent-3), transparent 68%);
+    opacity: 0.55;
+    animation: drift1 28s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 36vw; height: 36vw; max-width: 540px; max-height: 540px;
+    bottom: -18%; right: -12%;
+    background: radial-gradient(circle at 60% 60%, var(--accent-1), transparent 68%);
+    opacity: 0.45;
+    animation: drift2 34s ease-in-out infinite;
+  }
+  @keyframes drift1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(5%,7%) scale(1.08);} }
+  @keyframes drift2 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-6%,-5%) scale(1.1);} }
+  @media (prefers-reduced-motion: reduce) {
+    .orb-1, .orb-2 { animation: none; }
+    .field { transition: none; }
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; animation: rise 0.7s cubic-bezier(.16,1,.3,1) forwards; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; animation: none; } }
+
+  /* ---------- open stage: no card, no border ---------- */
+  .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .server-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text-faint);
+    letter-spacing: 0.01em;
+    margin-bottom: 44px;
+  }
+  .server-pill .beacon {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 0 0 var(--glow);
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(59,130,246,0.55); }
+    70%  { box-shadow: 0 0 0 7px rgba(59,130,246,0); }
+    100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .server-pill .beacon { animation: none; } }
+
+  .mark {
+    width: 60px; height: 60px;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(150deg, var(--accent-3), var(--accent-1) 75%);
+    box-shadow: 0 16px 34px -10px rgba(37,99,235,0.55);
+    margin-bottom: 22px;
+  }
+  .mark svg { width: 28px; height: 28px; fill: #fff; }
+
+  h1 {
+    font-size: clamp(34px, 7.5vw, 46px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.22;
+    padding-bottom: 0.08em;
+    background: linear-gradient(135deg, var(--text) 20%, var(--accent-1) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .lede {
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    max-width: 30ch;
+    margin-bottom: 40px;
+  }
+  .lede b { color: var(--text); font-weight: 600; }
+
+  /* ---------- the beacon: single hero CTA, the whole page's thesis ---------- */
+  .btn-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+  }
+  .btn-glow {
+    position: absolute;
+    inset: -14px;
+    border-radius: 100px;
+    background: radial-gradient(closest-side, var(--glow), transparent 70%);
+    opacity: 0.55;
+    z-index: -1;
+    pointer-events: none;
+    animation: breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.4; transform: scale(0.96); }
+    50%      { opacity: 0.7; transform: scale(1.04); }
+  }
+  @media (prefers-reduced-motion: reduce) { .btn-glow { animation: none; } }
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 55%, var(--accent-3) 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16.5px;
+    letter-spacing: -0.01em;
+    padding: 19px 28px;
+    border-radius: 100px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(.16,1,.3,1), filter 0.2s ease;
+  }
+  .btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+  }
+  .btn:hover { transform: translateY(-2px); filter: brightness(1.04); }
+  .btn:hover::after { transform: translateX(120%); }
+  .btn:active { transform: translateY(0) scale(0.99); }
+  .btn .os-icon { width: 19px; height: 19px; flex-shrink: 0; }
+  .btn .os-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+  .hint {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    min-height: 18px;
+  }
+  .hint b { color: var(--text); font-weight: 600; }
+  .hint code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--accent-soft);
+    border-radius: 5px;
+    padding: 1px 6px;
+  }
+
+  /* ---------- quiet text toggles, no boxed buttons ---------- */
+  .toggles {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+  }
+  .toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .toggle-btn:hover { color: var(--accent-2); border-color: var(--accent-2); }
+  .toggle-btn .arrow {
+    display: inline-block;
+    font-size: 9px;
+    transition: transform 0.3s cubic-bezier(.16,1,.3,1);
+  }
+  .toggle-btn .arrow.open { transform: rotate(180deg); }
+  .dot-sep { color: var(--hairline); font-size: 11px; }
+
+  .dropdown-content {
+    width: 100%;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(.16,1,.3,1), opacity 0.3s ease;
+    opacity: 0;
+  }
+  .dropdown-content.open { grid-template-rows: 1fr; opacity: 1; margin-top: 18px; }
+  .dropdown-content > div { overflow: hidden; min-height: 0; }
+
+  .other-links { display: flex; flex-direction: column; gap: 6px; }
+  .other-links a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 13px 16px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s cubic-bezier(.16,1,.3,1);
+  }
+  .other-links a:hover { background: var(--accent-soft); transform: translateY(-1px); }
+  .other-links a.disabled { opacity: 0.4; cursor: default; }
+  .other-links a.disabled:hover { background: none; transform: none; }
+  .other-links .os-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .other-links .os-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+  .cmd-block {
+    text-align: left;
+    background: var(--surface);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--hairline);
+    padding: 14px 14px 14px 16px;
+    border-radius: 16px;
+  }
+  .cmd-row { display: flex; align-items: center; gap: 10px; }
+  .cmd-text {
+    flex: 1;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    word-break: break-all;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .cmd-text .prompt { color: var(--accent-2); user-select: none; font-weight: 700; }
+  .cmd-block.center { text-align: center; color: var(--text-dim); font-size: 13px; padding: 14px; }
+
+  .copy-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-soft);
+    color: var(--accent-2);
+    border: none;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .copy-btn:hover { transform: translateY(-1px); background: var(--surface-hover); }
+  .copy-btn:active { transform: translateY(0) scale(0.97); }
+  .copy-btn.copied { color: #16a34a; }
+  .copy-icon { font-size: 12px; line-height: 1; }
+
+
+  .srv-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .srv-table td { padding: 7px 4px; border-top: 1px solid var(--hairline); vertical-align: middle; }
+  .srv-table tr:first-child td { border-top: 0; }
+  .srv-table td:first-child { color: var(--text-dim); white-space: nowrap; width: 1%; padding-right: 10px; }
+  .srv-table code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; word-break: break-all; color: var(--text); }
+  .srv-table .copy-btn { padding: 5px 8px; }
+  .srv-note { margin-top: 10px; font-size: 12px; color: var(--text-dim); text-align: center; }
+
+  .foot { margin-top: 44px; font-size: 11.5px; color: var(--text-faint); }
+  .foot a { color: var(--text-dim); text-decoration: none; border-bottom: 1px solid var(--hairline); }
+  .foot a:hover { color: var(--accent-2); border-color: var(--accent-2); }
+  .consent { margin-top: 14px; font-size: 12px; color: var(--text-faint); max-width: 34ch; line-height: 1.55; }
+  .consent a { color: var(--text-dim); }
+
+  .btn:focus-visible, .toggle-btn:focus-visible, .other-links a:focus-visible, .copy-btn:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 48px 18px; }
+    .toggles { flex-wrap: wrap; justify-content: center; row-gap: 8px; column-gap: 20px; }
+    .dot-sep { display: none; }
+    .cmd-row { flex-direction: column; align-items: stretch; }
+    .copy-btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="field" id="bgField" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<div class="stage">
+  <div class="server-pill reveal mono" id="ipPill">
+    <span class="beacon"></span>
+    <span id="ipText">определяю ваш IP…</span>
+  </div>
+
+  <div class="mark reveal">
+    <svg viewBox="0 0 24 24"><path d="M12 2 3 6v6c0 5.2 3.8 9.9 9 11 5.2-1.1 9-5.8 9-11V6l-9-4zm0 2.2 7 3.1v4.7c0 4.2-2.9 7.9-7 8.9-4.1-1-7-4.7-7-8.9V7.3l7-3.1zm-1 5.3v6h2v-6h-2zm0 7.5v2h2v-2h-2z"/></svg>
+  </div>
+
+  <h1 class="reveal">Подключитесь<br>за минуту</h1>
+  <p class="lede reveal">Скачайте установщик и запустите его — в конце вы увидите свой <b>ID</b>. Сервер и ключ уже встроены.</p>
+
+  <a class="btn reveal" id="downloadBtn">
+    <span class="os-icon" id="btnIcon"></span>
+    <span id="btnText">Скачать RustDesk</span>
+  </a>
+  <div class="hint reveal" id="hintText">Определяем вашу систему…</div>
+  <div class="consent reveal">Скачивая, вы соглашаетесь с <a href="/privacy">политикой конфиденциальности</a>: специалист получит постоянный доступ к компьютеру.</div>
+
+  <div class="toggles reveal">
+    <button class="toggle-btn" id="osToggle">Другая система <span class="arrow">▾</span></button>
+    <span class="dot-sep">·</span>
+    <button class="toggle-btn" id="cmdToggle">Консоль <span class="arrow">▾</span></button>
+    <span class="dot-sep">·</span>
+    <button class="toggle-btn" id="srvToggle">Настройки сервера <span class="arrow">▾</span></button>
+  </div>
+
+  <div class="dropdown-content" id="osDropdown">
+    <div class="other-links">
+      <a data-os="windows">
+        <span class="os-icon">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="win_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#40B7FF" />
+                <stop offset="100%" stop-color="#0067E6" />
+              </linearGradient>
+            </defs>
+            <g fill="url(#win_grad)">
+              <!-- Левый верхний -->
+              <rect x="2" y="2" width="13.2" height="13.2" rx="1.5" />
+              <!-- Правый верхний -->
+              <rect x="16.8" y="2" width="13.2" height="13.2" rx="1.5" />
+              <!-- Левый нижний -->
+              <rect x="2" y="16.8" width="13.2" height="13.2" rx="1.5" />
+              <!-- Правый нижний -->
+              <rect x="16.8" y="16.8" width="13.2" height="13.2" rx="1.5" />
+            </g>
+          </svg>
+        </span>
+        Windows
+      </a>
+      <a data-os="linux">
+        <span class="os-icon">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <!-- Черное тело и голова -->
+            <path d="M16 2C11 2 9 6 9 11C9 15 10.5 18.5 7.5 21C6 22.2 5 24 5 26C5 28.5 9 29.5 16 29.5C23 29.5 27 28.5 27 26C27 24 26 22.2 24.5 21C21.5 18.5 23 15 23 11C23 6 21 2 16 2Z" fill="#000000" />
+            <!-- Желтые лапы -->
+            <path d="M5 25C3.5 25.5 2 26.5 2 28C2 29.5 5 30 8.5 30C11 30 13 29.5 13.5 28.5" stroke="#000000" stroke-width="1" fill="#FFC107" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M27 25C28.5 25.5 30 26.5 30 28C30 29.5 27 30 23.5 30C21 30 19 29.5 18.5 28.5" stroke="#000000" stroke-width="1" fill="#FFC107" stroke-linecap="round" stroke-linejoin="round" />
+            <!-- Белый животик и лицо -->
+            <path d="M16 9C12.5 9 11.5 11.5 11.5 13.5C11.5 15.2 12.5 16 14 16C13 18.5 10.5 21 10.5 24.5C10.5 27.5 12.5 28.5 16 28.5C19.5 28.5 21.5 27.5 21.5 24.5C21.5 21 19 18.5 18 16C19.5 16 20.5 15.2 20.5 13.5C20.5 11.5 19.5 9 16 9Z" fill="#FFFFFF" />
+            <!-- Глаза (белки) -->
+            <ellipse cx="14" cy="9.5" rx="2" ry="3" fill="#FFFFFF" stroke="#000000" stroke-width="0.75" />
+            <ellipse cx="18" cy="9.5" rx="2" ry="3" fill="#FFFFFF" stroke="#000000" stroke-width="0.75" />
+            <!-- Зрачки -->
+            <circle cx="14.5" cy="10" r="1" fill="#000000" />
+            <circle cx="17.5" cy="10" r="1" fill="#000000" />
+            <!-- Клюв -->
+            <path d="M16 11.5C13.5 11.5 12 13 12 13.5C12 14.8 13.5 15.5 16 15.5C18.5 15.5 20 14.8 20 13.5C20 13 18.5 11.5 16 11.5Z" fill="#FF9800" stroke="#000000" stroke-width="0.75" stroke-linejoin="round" />
+            <!-- Линия улыбки на клюве -->
+            <path d="M12.5 13.2C14 14 18 14 19.5 13.2" stroke="#000000" stroke-width="0.5" fill="none" />
+          </svg>
+        </span>
+        Linux
+      </a>
+      <a data-os="macos">
+        <span class="os-icon">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="finder_clip">
+                <rect width="32" height="32" rx="7" />
+              </clipPath>
+              <linearGradient id="finder_blue" x1="0" y1="0" x2="0" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#3BC1FF" />
+                <stop offset="100%" stop-color="#1B6DFB" />
+              </linearGradient>
+            </defs>
+            <g clip-path="url(#finder_clip)">
+              <!-- Левая синяя сторона -->
+              <rect width="32" height="32" fill="url(#finder_blue)" />
+              <!-- Правая светлая сторона с носом -->
+              <path d="M16 0 L16 12 L13 12 L13 16.5 L16.5 16.5 L16.5 32 H32 V0 Z" fill="#F3F7FD" />
+              <!-- Глаза -->
+              <rect x="8" y="10" width="2.5" height="5" rx="1.25" fill="#1C274C" />
+              <rect x="21.5" y="10" width="2.5" height="5" rx="1.25" fill="#1C274C" />
+              <!-- Улыбка -->
+              <path d="M 7 20 Q 16 27 25 20" stroke="#1C274C" stroke-width="2" stroke-linecap="round" fill="none" />
+            </g>
+          </svg>
+        </span>
+        macOS
+      </a>
+    </div>
+  </div>
+
+  <div class="dropdown-content" id="cmdDropdown">
+    <div id="cmdContent"></div>
+  </div>
+
+  <div class="dropdown-content" id="srvDropdown">
+    <div>
+      <div class="cmd-block">
+        <table class="srv-table">
+          <tr><td>ID-сервер</td><td><code>{{RDS}}</code></td><td><button class="copy-btn" data-copy="{{RDS}}"><span class="copy-icon">⧉</span></button></td></tr>
+          <tr><td>Ретранслятор</td><td><code>{{RDS}}</code></td><td><button class="copy-btn" data-copy="{{RDS}}"><span class="copy-icon">⧉</span></button></td></tr>
+          <tr><td>API-сервер</td><td><code>{{API}}</code></td><td><button class="copy-btn" data-copy="{{API}}"><span class="copy-icon">⧉</span></button></td></tr>
+          <tr><td>Ключ</td><td><code>{{KEY}}</code></td><td><button class="copy-btn" data-copy="{{KEY}}"><span class="copy-icon">⧉</span></button></td></tr>
+        </table>
+      </div>
+      <div class="srv-note">Если RustDesk уже установлен: ⋮ рядом с ID → «Сеть» → «ID/Ретранслятор сервер». Порты указывать не нужно.</div>
+    </div>
+  </div>
+
+  <div class="foot reveal mono">RustDesk {{VER}} · <a href="/privacy">Конфиденциальность</a></div>
+</div>
+
+<script>
+(function() {
+  // Base URL for every download link and command shown below. Comes from
+  // PUBLIC_URL in .env if set (e.g. behind a reverse proxy on a subpath
+  // like https://example.com/rd), otherwise falls back to http://IP:PORT.
+  const PUBLIC_BASE = '{{BASE}}';
+  function q() { return ''; }   // мастер-пароль всегда; вариант без него — на странице /privacy
+
+  const ua = navigator.userAgent.toLowerCase();
+  const plat = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '').toLowerCase();
+
+  let detectedOS = 'other';
+  if (ua.includes('win') || plat.includes('win')) detectedOS = 'windows';
+  else if (ua.includes('mac') || plat.includes('mac')) detectedOS = 'macos';
+  else if (ua.includes('linux') || plat.includes('linux')) detectedOS = 'linux';
+
+  let currentOS = detectedOS;
+
+  const btn = document.getElementById('downloadBtn');
+  const btnText = document.getElementById('btnText');
+  const btnIcon = document.getElementById('btnIcon');
+  const hint = document.getElementById('hintText');
+  const osToggle = document.getElementById('osToggle');
+  const osDropdown = document.getElementById('osDropdown');
+  const cmdToggle = document.getElementById('cmdToggle');
+  const cmdDropdown = document.getElementById('cmdDropdown');
+  const cmdContent = document.getElementById('cmdContent');
+  const osLinks = document.querySelectorAll('.other-links a[data-os]');
+
+  const osIcons = {
+    windows: `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g fill="#FFFFFF"><rect x="2" y="2" width="13.2" height="13.2" rx="1.5" /><rect x="16.8" y="2" width="13.2" height="13.2" rx="1.5" /><rect x="2" y="16.8" width="13.2" height="13.2" rx="1.5" /><rect x="16.8" y="16.8" width="13.2" height="13.2" rx="1.5" /></g></svg>`,
+    linux: `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C11 2 9 6 9 11C9 15 10.5 18.5 7.5 21C6 22.2 5 24 5 26C5 28.5 9 29.5 16 29.5C23 29.5 27 28.5 27 26C27 24 26 22.2 24.5 21C21.5 18.5 23 15 23 11C23 6 21 2 16 2Z" fill="#000000" /><path d="M5 25C3.5 25.5 2 26.5 2 28C2 29.5 5 30 8.5 30C11 30 13 29.5 13.5 28.5" stroke="#000000" stroke-width="1" fill="#FFC107" stroke-linecap="round" stroke-linejoin="round" /><path d="M27 25C28.5 25.5 30 26.5 30 28C30 29.5 27 30 23.5 30C21 30 19 29.5 18.5 28.5" stroke="#000000" stroke-width="1" fill="#FFC107" stroke-linecap="round" stroke-linejoin="round" /><path d="M16 9C12.5 9 11.5 11.5 11.5 13.5C11.5 15.2 12.5 16 14 16C13 18.5 10.5 21 10.5 24.5C10.5 27.5 12.5 28.5 16 28.5C19.5 28.5 21.5 27.5 21.5 24.5C21.5 21 19 18.5 18 16C19.5 16 20.5 15.2 20.5 13.5C20.5 11.5 19.5 9 16 9Z" fill="#FFFFFF" /><ellipse cx="14" cy="9.5" rx="2" ry="3" fill="#FFFFFF" stroke="#000000" stroke-width="0.75" /><ellipse cx="18" cy="9.5" rx="2" ry="3" fill="#FFFFFF" stroke="#000000" stroke-width="0.75" /><circle cx="14.5" cy="10" r="1" fill="#000000" /><circle cx="17.5" cy="10" r="1" fill="#000000" /><path d="M16 11.5C13.5 11.5 12 13 12 13.5C12 14.8 13.5 15.5 16 15.5C18.5 15.5 20 14.8 20 13.5C20 13 18.5 11.5 16 11.5Z" fill="#FF9800" stroke="#000000" stroke-width="0.75" stroke-linejoin="round" /><path d="M12.5 13.2C14 14 18 14 19.5 13.2" stroke="#000000" stroke-width="0.5" fill="none" /></svg>`,
+    macos: `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="btn_finder_clip"><rect width="32" height="32" rx="7" /></clipPath><linearGradient id="btn_finder_blue" x1="0" y1="0" x2="0" y2="32" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#3BC1FF" /><stop offset="100%" stop-color="#1B6DFB" /></linearGradient></defs><g clip-path="url(#btn_finder_clip)"><rect width="32" height="32" fill="url(#btn_finder_blue)" /><path d="M16 0 L16 12 L13 12 L13 16.5 L16.5 16.5 L16.5 32 H32 V0 Z" fill="#F3F7FD" /><rect x="8" y="10" width="2.5" height="5" rx="1.25" fill="#1C274C" /><rect x="21.5" y="10" width="2.5" height="5" rx="1.25" fill="#1C274C" /><path d="M 7 20 Q 16 27 25 20" stroke="#1C274C" stroke-width="2" stroke-linecap="round" fill="none" /></g></svg>`,
+    other: ''
+  };
+
+  function cmdBlock(prompt, text) {
+    return `
+          <div class="cmd-block">
+            <div class="cmd-row">
+              <code class="cmd-text"><span class="prompt">${prompt}</span> ${text}</code>
+              <button class="copy-btn" onclick="copyCmdText(this)"><span class="copy-icon">⧉</span><span class="copy-label">Копировать</span></button>
+            </div>
+          </div>`;
+  }
+
+  const configs = {
+    windows: {
+      href: function() { return PUBLIC_BASE + '/download/windows' + q(); },
+      text: 'Скачать для Windows',
+      hint: 'Запустите файл и разрешите изменения. Через 1–3 минуты появится окно с вашим <b>ID</b>.',
+      cmd: function() {
+        return cmdBlock('PS&gt;', `powershell -Command "(New-Object System.Net.WebClient).DownloadFile('${PUBLIC_BASE}/download/windows${q()}', '$env:TEMP\\RustDesk-Setup.exe'); Start-Process -FilePath '$env:TEMP\\RustDesk-Setup.exe' -Verb RunAs"`);
+      },
+      enabled: true,
+      icon: osIcons.windows
+    },
+    linux: {
+      href: function() { return PUBLIC_BASE + '/download/deb' + q(); },
+      text: 'Скачать для Linux (.deb)',
+      hint: 'Пакет .deb — для Debian, Ubuntu, Astra (x86_64): <code>sudo apt install ./rustdesk-neth*.deb</code>, в конце будет показан ваш <b>ID</b>. <b>Любой другой Linux</b> (CentOS, РЕД ОС, ALT, openSUSE, Arch, процессоры ARM) — откройте «Консоль» и выполните одну команду: она сама определит систему.',
+      cmd: function() {
+        return cmdBlock('$', `curl -fsSL ${PUBLIC_BASE}/linux.sh${q()} | sudo sh`);
+      },
+      enabled: true,
+      icon: osIcons.linux
+    },
+    macos: {
+      href: function() { return PUBLIC_BASE + '/download/mac' + q(); },
+      text: 'Скачать для macOS',
+      hint: 'Откройте <b>RustDesk-Setup.pkg</b> и следуйте установщику — в конце появится ваш <b>ID</b>. Затем включите RustDesk в трёх разделах настроек — установщик сам их откроет. Если macOS не даёт открыть: Системные настройки → Конфиденциальность и безопасность → «Всё равно открыть».',
+      cmd: function() {
+        return cmdBlock('$', `curl -fsSL ${PUBLIC_BASE}/mac.sh${q()} | sudo bash`);
+      },
+      enabled: true,
+      icon: osIcons.macos
+    },
+    other: {
+      href: function() { return '#'; },
+      text: 'Скачать RustDesk',
+      hint: 'Выберите систему в списке «Другая система»',
+      cmd: function() {
+        return `<div class="cmd-block center">Выберите операционную систему в списке выше</div>`;
+      },
+      enabled: false,
+      icon: ''
+    }
+  };
+
+  function updateUI(os) {
+    const cfg = configs[os] || configs.other;
+
+    if (!cfg.enabled) {
+      btn.href = '#';
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+    } else {
+      btn.href = cfg.href();
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    }
+
+    btnText.textContent = cfg.text;
+    btnIcon.innerHTML = cfg.icon;
+    hint.innerHTML = cfg.hint;
+
+    if (typeof cfg.cmd === 'function') {
+      cmdContent.innerHTML = cfg.cmd();
+    } else {
+      cmdContent.innerHTML = cfg.cmd;
+    }
+
+    currentOS = os;
+    updateOtherLinks();
+  }
+
+  function updateOtherLinks() {
+    osLinks.forEach(link => {
+      const os = link.dataset.os;
+      if (os === currentOS) {
+        link.style.display = 'none';
+      } else {
+        link.style.display = 'flex';
+        link.classList.remove('disabled');
+      }
+    });
+  }
+
+  function toggleDropdown(dropdown, toggleBtn) {
+    const isOpen = dropdown.classList.contains('open');
+    const arrow = toggleBtn.querySelector('.arrow');
+
+    if (isOpen) {
+      dropdown.classList.remove('open');
+      arrow.classList.remove('open');
+    } else {
+      dropdown.classList.add('open');
+      arrow.classList.add('open');
+    }
+  }
+
+  osToggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleDropdown(osDropdown, osToggle);
+  });
+
+  cmdToggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleDropdown(cmdDropdown, cmdToggle);
+  });
+
+  const srvToggle = document.getElementById('srvToggle');
+  const srvDropdown = document.getElementById('srvDropdown');
+  srvToggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleDropdown(srvDropdown, srvToggle);
+  });
+  document.querySelectorAll('.srv-table .copy-btn').forEach(function(b) {
+    b.addEventListener('click', function() {
+      const t = b.dataset.copy;
+      const done = function() { b.classList.add('copied'); b.querySelector('.copy-icon').textContent = '✓';
+        setTimeout(function() { b.classList.remove('copied'); b.querySelector('.copy-icon').textContent = '⧉'; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(function() { fallbackCopy(t, done); });
+      else fallbackCopy(t, done);
+    });
+  });
+
+
+  osLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const os = this.dataset.os;
+      updateUI(os);
+      osDropdown.classList.remove('open');
+      osToggle.querySelector('.arrow').classList.remove('open');
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.stage')) {
+      osDropdown.classList.remove('open');
+      osToggle.querySelector('.arrow').classList.remove('open');
+      cmdDropdown.classList.remove('open');
+      cmdToggle.querySelector('.arrow').classList.remove('open');
+      srvDropdown.classList.remove('open');
+      srvToggle.querySelector('.arrow').classList.remove('open');
+    }
+  });
+
+  updateUI(detectedOS);
+
+})();
+
+/* Copy-to-clipboard for console commands */
+function copyCmdText(button) {
+  const row = button.closest('.cmd-row');
+  const codeEl = row.querySelector('.cmd-text');
+  const raw = codeEl.textContent.replace(/^\s*(PS>|\$)\s*/, '').trim();
+
+  function showCopied() {
+    const label = button.querySelector('.copy-label');
+    const icon = button.querySelector('.copy-icon');
+    const prevLabel = label.textContent;
+    const prevIcon = icon.textContent;
+    button.classList.add('copied');
+    label.textContent = 'Скопировано';
+    icon.textContent = '✓';
+    setTimeout(function() {
+      button.classList.remove('copied');
+      label.textContent = prevLabel;
+      icon.textContent = prevIcon;
+    }, 1600);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(raw).then(showCopied).catch(function() {
+      fallbackCopy(raw, showCopied);
+    });
+  } else {
+    fallbackCopy(raw, showCopied);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+
+/* Subtle parallax on the ambient field, disabled for reduced-motion users */
+(function() {
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+  const field = document.getElementById('bgField');
+  let ticking = false;
+  let targetX = 0, targetY = 0;
+
+  window.addEventListener('mousemove', function(e) {
+    const nx = (e.clientX / window.innerWidth) - 0.5;
+    const ny = (e.clientY / window.innerHeight) - 0.5;
+    targetX = nx * 22;
+    targetY = ny * 22;
+    if (!ticking) {
+      window.requestAnimationFrame(function() {
+        field.style.transform = 'translate3d(' + targetX + 'px, ' + targetY + 'px, 0)';
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+
+/* Staggered entrance animation delays */
+(function() {
+  const items = document.querySelectorAll('.reveal');
+  items.forEach(function(el, i) {
+    if (!el.style.animationDelay) {
+      el.style.animationDelay = (i * 0.07) + 's';
+    }
+  });
+})();
+/* Show the visitor's own IP instead of the server address.
+   /whoami is what nginx sees ($remote_addr) - correct for real visitors,
+   but if the page is opened from the same LAN as the server, routers with
+   NAT hairpin/loopback often rewrite the source to their own local address
+   (e.g. 192.168.0.1). In that case fall back to a public IP lookup done by
+   the visitor's own browser, which isn't affected by that server-side quirk. */
+(function() {
+  const ipText = document.getElementById('ipText');
+  if (!ipText) return;
+
+  function isPrivate(ip) {
+    return /^(10\.|127\.|192\.168\.|169\.254\.|::1$|f[cd][0-9a-f]{2}:)/i.test(ip)
+      || /^172\.(1[6-9]|2\d|3[0-1])\./.test(ip);
+  }
+
+  function tryPublicFallback() {
+    fetch('https://api.ipify.org?format=text', { cache: 'no-store' })
+      .then(function(r) { return r.ok ? r.text() : Promise.reject(); })
+      .then(function(ip) { ipText.textContent = 'ваш IP: ' + ip.trim(); })
+      .catch(function() {
+        const pill = document.getElementById('ipPill');
+        if (pill) pill.style.display = 'none';
+      });
+  }
+
+  // Same PUBLIC_BASE substitution as above, needed here too since this is a
+  // separate IIFE (module-scoped consts don't cross function boundaries).
+  const PUBLIC_BASE = '{{BASE}}';
+
+  fetch(PUBLIC_BASE + '/whoami', { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.text() : Promise.reject(); })
+    .then(function(ip) {
+      ip = ip.trim();
+      if (isPrivate(ip)) {
+        tryPublicFallback();
+      } else {
+        ipText.textContent = 'ваш IP: ' + ip;
+      }
+    })
+    .catch(tryPublicFallback);
+})();
+</script>
+</body>
+</html>

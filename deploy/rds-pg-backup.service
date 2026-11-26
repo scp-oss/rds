@@ -1,0 +1,7 @@
+[Unit]
+Description=RDS: копия базы панели по расписанию из настроек панели (/opt/RDS/data/backup)
+After=docker.service
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/bin/sh /opt/RDS/pg-backup.sh

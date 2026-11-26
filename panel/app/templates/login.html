@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="alternate icon" href="/favicon.ico"><title>RDS — вход</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--fg:#1b2330;--mut:#5d6878;--line:#dde3ea;--acc:#1f6feb;--err:#cf222e}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141a;--card:#171e27;--fg:#e6edf3;--mut:#9aa7b4;--line:#2a3441;--acc:#4c8dff;--err:#ff7b72}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px}
+form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;width:100%;max-width:340px}
+h1{font-size:20px;margin:0 0 18px}label{display:block;font-size:14px;color:var(--mut);margin:12px 0 4px}
+input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--fg);font-size:16px}
+button{width:100%;margin-top:20px;padding:11px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;font-size:16px;cursor:pointer}
+#e{color:var(--err);font-size:14px;min-height:20px;margin-top:10px}
+</style></head><body>
+<form id="f"><h1>RDS · админка</h1>
+<label for="u">Логин</label><input id="u" autocomplete="username" required>
+<label for="p">Пароль</label><input id="p" type="password" autocomplete="current-password" required>
+<div id="ow" hidden><label for="o">Код из приложения (2FA)</label><input id="o" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+<button>Войти</button><div id="e"></div><div id="tm" style="font-size:12px;color:var(--mut);margin-top:6px"></div></form>
+<script>
+document.getElementById('f').onsubmit=async ev=>{ev.preventDefault();const e=document.getElementById('e');e.textContent='';
+ const r=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:u.value,password:p.value,otp:o.value})});
+ if(r.ok)location.reload();else{let d={};try{d=await r.json()}catch(_){};if(d.need_otp){ow.hidden=false;o.required=true;o.focus()}e.textContent=d.detail||('Ошибка '+r.status)}};
+(async()=>{try{const t0=Date.now(),r=await fetch('/api/time',{cache:'no-store'}),d=await r.json(),t1=Date.now(),diff=Math.round((d.t*1000-(t0+t1)/2)/1000),el=document.getElementById('tm');
+ el.textContent='Время сервера: '+new Date(d.t*1000).toLocaleTimeString('ru-RU');
+ if(Math.abs(diff)>=20){el.style.color='var(--err)';el.textContent+=' — расходится с этим устройством на '+Math.abs(diff)+' с'+(Math.abs(diff)>=60?'. Коды 2FA могут не подойти: настройте время на сервере (NTP)':'')}}catch(_){}})();
+</script></body></html>

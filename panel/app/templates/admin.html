@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="alternate icon" href="/favicon.ico"><title>RDS · устройства</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--fg:#1b2330;--mut:#5d6878;--line:#dde3ea;--acc:#1f6feb;--ok:#1a7f37;--off:#8c959f;--warn:#9a6700;--err:#cf222e;--chip:#eef1f5}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141a;--card:#171e27;--fg:#e6edf3;--mut:#9aa7b4;--line:#2a3441;--acc:#4c8dff;--ok:#3fb950;--off:#6e7681;--warn:#d29922;--err:#ff7b72;--chip:#222c38}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+header h1{font-size:18px;margin:0}header .r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+main{max-width:1900px;margin:0 auto;padding:16px}
+button,.b{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer;text-decoration:none}
+button.p{background:var(--acc);border-color:var(--acc);color:#fff}button.d{color:var(--err)}
+input[type=search]{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;min-width:200px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px}
+.stat b{font-size:20px;display:block}.stat span{color:var(--mut);font-size:13px}
+.tw{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:860px}th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.03em}tr:last-child td{border-bottom:0}
+.id{font:600 15px ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}.mut{color:var(--mut);font-size:13px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--off);margin-right:6px}.dot.on{background:var(--ok)}
+#adBtn .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--off)}#adBtn .d.ok{background:var(--ok)}#adBtn .d.bad{background:var(--err)}
+.adf{display:grid;gap:10px;margin-top:6px}.adf label{display:grid;gap:4px;font-size:13px;color:var(--mut)}
+.adf input[type=text],.adf input[type=password]{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+.adf .ck{display:flex;gap:8px;align-items:center;color:var(--fg)}
+.osi{text-align:center;width:44px}.osi svg{width:22px;height:22px;vertical-align:middle}.osi .lx{font-size:20px;line-height:1}
+.swc{white-space:nowrap}.swc .v{font-size:13px}.swc button{font-size:12px;padding:3px 8px;margin-left:6px}.swc .upd{border-color:var(--warn);color:var(--warn)}
+.swc .r{font-size:11px;color:var(--mut);white-space:normal;max-width:220px}.swl{max-height:55vh;overflow:auto;margin-top:8px}
+.hwb{font-size:13px;padding:4px 9px}.ipc{white-space:nowrap}
+.md.hw{max-width:720px;max-height:90vh;overflow:auto}.hwg{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:14px;margin:6px 0 14px}
+.hwg dt{color:var(--mut)}.hwg dd{margin:0;word-break:break-word}.md h4{margin:16px 0 6px;font-size:14px}
+.hwt{width:100%;border-collapse:collapse;min-width:0;font-size:13px}.hwt th,.hwt td{padding:5px 6px;border-bottom:1px solid var(--line)}
+.cmdl{display:flex;gap:6px;align-items:center;margin:4px 0}.cmdl code{flex:1;font:12px ui-monospace,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;overflow-x:auto;white-space:nowrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.seg button{border:0;border-radius:0;padding:6px 10px;background:var(--card);color:var(--mut)}
+.seg button+button{border-left:1px solid var(--line)}.seg button.on{background:var(--acc);color:#fff}
+.gpick{display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:none;border:1px dashed transparent;padding:3px 6px;text-align:left;min-width:120px}
+.gpick:hover{border-color:var(--line);background:var(--bg)}.gpick .ar{color:var(--mut);font-size:11px;margin-left:2px}
+#gpop{position:fixed;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);width:260px;max-height:340px;display:none;flex-direction:column}
+#gpop.on{display:flex}#gpop .gl{overflow:auto;padding:4px 0}#gpop label{display:flex;gap:8px;align-items:center;padding:6px 12px;cursor:pointer;font-size:14px}
+#gpop label:hover{background:var(--bg)}#gpop .gn{border-top:1px solid var(--line);padding:8px}
+#gpop .gn input{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px}
+#gpop .gh{padding:8px 12px 4px;font-size:12px;color:var(--mut)}
+.chip{display:inline-block;background:var(--chip);border-radius:6px;padding:1px 7px;font-size:12px;margin-right:4px}.chip.w{color:var(--warn)}
+.note{border:0;background:transparent;color:var(--fg);font:inherit;font-size:13px;width:100%;min-width:120px;padding:4px;border-radius:6px}
+.note:focus{outline:1px solid var(--acc);background:var(--bg)}
+.acts{white-space:nowrap;display:flex;gap:6px}
+#tb .acts{display:grid;grid-template-columns:118px 76px;gap:6px;align-items:center}
+.pw{display:flex;gap:6px;align-items:center;white-space:nowrap}.pw button{width:34px;height:30px;padding:0;font-size:16px;line-height:1}.pw .on{color:var(--ok)}.pw .off{color:var(--err)}.pw .rb{color:var(--acc)}.pw .chip{font-size:11px}#tb .acts>*{justify-self:start}
+section.build{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+section.build h2{font-size:16px;margin:0 0 8px}pre{font:12px/1.4 ui-monospace,Consolas,monospace;background:var(--bg);border-radius:8px;padding:8px;max-height:180px;overflow:auto;white-space:pre-wrap;margin:8px 0 0}
+.mb{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
+.mb.on{display:flex}.md{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:100%;max-width:420px}
+.md h3{margin:0 0 4px;font-size:17px}.md .sub{color:var(--mut);font-size:13px;margin:0 0 14px}
+.md a.go{display:block;text-align:center;background:var(--acc);color:#fff;text-decoration:none;font-weight:600;padding:11px;border-radius:10px}
+.md .pw{display:flex;gap:8px;margin-top:14px;align-items:center}.md .pw code{flex:1;font:14px ui-monospace,Consolas,monospace;background:var(--bg);padding:8px 10px;border-radius:8px;word-break:break-all}
+.md .x{float:right;border:0;background:none;font-size:18px;color:var(--mut);cursor:pointer;padding:0 4px}
+.md ol{margin:14px 0 0;padding-left:18px;color:var(--mut);font-size:13px}
+.tabs{display:flex;gap:6px;margin:0 0 14px}.tabs button{padding:8px 14px}.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.grp{border:1px solid transparent;background:transparent;color:var(--fg);font:inherit;font-size:13px;width:120px;padding:4px 6px;border-radius:6px}
+.grp:focus,.grp:hover{border-color:var(--line);outline:0;background:var(--bg)}
+form.uf{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+form.uf label{font-size:12px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+form.uf input[type=text],form.uf input[type=password]{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+form.uf .ck{flex-direction:row;align-items:center;gap:8px;font-size:14px;color:var(--fg)}
+.hint{color:var(--mut);font-size:13px;margin:0 0 12px}
+.dl{max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+.dl label{display:flex;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+.dl label:last-child{border-bottom:0}.dl label:hover{background:var(--bg)}.dl .own{margin-left:auto;font-size:12px;color:var(--warn)}
+.md.wide{max-width:560px}.md .row{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.md input[type=search]{width:100%;margin-top:4px}
+.b.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.id.cp{cursor:pointer;border-bottom:1px dashed transparent}.id.cp:hover{border-bottom-color:var(--acc);color:var(--acc)}
+tr.new td{background:color-mix(in srgb,var(--acc) 9%,transparent)}.newb{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;color:#fff;background:var(--acc);border-radius:6px;padding:1px 6px;vertical-align:middle}
+#nb{display:none;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--acc);border-radius:12px;padding:10px 14px;margin:0 0 14px}
+#nb.on{display:flex}#nb .t{flex:1;min-width:220px;font-size:14px}#nb .t b{color:var(--acc)}
+.sw{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);cursor:pointer;user-select:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--card)}
+.sw input{position:absolute;opacity:0;pointer-events:none}.sw i{width:30px;height:18px;border-radius:9px;background:var(--line);position:relative;transition:background .2s}
+.sw i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw input:checked+i{background:var(--acc)}.sw input:checked+i::after{transform:translateX(12px)}.sw input:focus-visible+i{outline:2px solid var(--acc);outline-offset:2px}
+.star{border:0;background:none;padding:0 6px 0 0;font-size:17px;line-height:1;cursor:pointer;color:var(--off);vertical-align:-1px}.star.on{color:#f5b301}.star:hover{color:#f5b301}
+td.ck,th.ck{width:34px;padding-right:0}input.sel,#selAll{width:16px;height:16px;cursor:pointer;accent-color:var(--acc)}
+tr.selr td{background:color-mix(in srgb,var(--acc) 12%,transparent)}
+#bulk{display:none;position:sticky;top:0;z-index:5;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--acc);border-radius:12px;padding:8px 12px;margin:0 0 10px}
+#bulk.on{display:flex}#bulk b{font-size:14px}
+th[data-sort]{cursor:pointer;user-select:none;white-space:nowrap}th[data-sort]:hover{color:var(--fg)}
+th[data-sort]::after{content:"";margin-left:4px;opacity:.5}th[data-sort].asc::after{content:"▲";opacity:1;color:var(--acc)}th[data-sort].desc::after{content:"▼";opacity:1;color:var(--acc)}
+td.idc{white-space:nowrap}td.idc .dot{margin:0 6px 0 2px}
+.pw button svg{width:16px;height:16px;vertical-align:middle}.pw .cn{color:var(--acc)}.pw .lk{color:var(--warn)}
+#thr th[draggable=true]{cursor:grab}#thr th.dragging{opacity:.35}#thr th.dropl{box-shadow:inset 3px 0 0 var(--acc)}#thr th.dropr{box-shadow:inset -3px 0 0 var(--acc)}
+.colhint{display:flex;justify-content:flex-end;gap:10px;align-items:center;font-size:12px;color:var(--mut);margin:0 0 6px}.colhint button{font-size:12px;padding:3px 8px}
+.ucell{white-space:nowrap}.ucell .pen{border:0;background:none;padding:0 0 0 6px;cursor:pointer;font-size:12px;opacity:.55}.ucell .pen:hover{opacity:1}.ucell .chip{margin-left:6px;font-size:11px}.ucell .more{border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:12px;margin-left:6px;background:var(--chip);color:var(--fg);cursor:pointer}
+#upop{position:fixed;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);min-width:230px;max-height:340px;overflow:auto;padding:6px 0;display:none}
+#upop.on{display:block}#upop .gh{padding:6px 12px 4px;font-size:12px;color:var(--mut)}#upop .ur{display:flex;gap:8px;align-items:center;padding:5px 12px;font-size:14px}
+.perm{display:flex;gap:12px;font-size:13px;white-space:nowrap}.perm label{display:flex;gap:5px;align-items:center;cursor:pointer}
+#meName{font-size:13px}#hdrx{display:contents}
+#menuBtn{font-size:18px;line-height:1;padding:6px 11px}
+#menu{position:fixed;z-index:70;right:16px;top:64px;width:300px;max-width:calc(100vw - 20px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 32px rgba(0,0,0,.22);padding:12px;display:none;flex-direction:column;gap:8px}
+#menu.on{display:flex}#menu .mh{font-size:12px;color:var(--mut);margin-top:4px}#menu .mh:first-child{margin-top:0}#menu .sw{justify-content:flex-start}#menu .seg{align-self:flex-start}
+.pwset{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--mut)}.pwset label{display:flex;flex-direction:column;gap:3px}.pwset input,.pwset textarea{box-sizing:border-box;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);font:13px/1.35 inherit}.pwset textarea{font-family:inherit}.pwh{font-size:11px}.pwb{display:flex;gap:8px;justify-content:flex-end}
+#menuMore{display:flex;flex-direction:column;gap:8px}#menuMore:not(:empty){border-top:1px solid var(--line);padding-top:10px;margin-top:4px}#menuMore>*{align-self:stretch;text-align:center}
+@media (max-width:760px){
+ header{padding:10px 12px;gap:8px;flex-wrap:nowrap}header h1{font-size:15px;white-space:nowrap}header .r{flex:1;flex-wrap:nowrap;justify-content:flex-end;min-width:0}
+ #q{min-width:0;flex:1;width:100%}main{padding:10px}
+ .tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs button{white-space:nowrap;padding:7px 10px;flex:none}
+ .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.stat{padding:6px 8px;min-width:0}.stat b{font-size:16px}.stat span{font-size:11px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .colhint span{display:none}#menu{right:10px;left:10px;width:auto;top:56px}
+ section.build{padding:12px}.md{padding:16px}
+}
+form.uf textarea,form.uf select{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+form.uf textarea{font:12px/1.4 ui-monospace,Consolas,monospace;resize:vertical;min-height:38px}
+.jst{font-size:12px;border-radius:6px;padding:1px 7px;background:var(--chip)}.jst.ok{color:var(--ok)}.jst.error{color:var(--err)}.jst.running,.jst.queued{color:var(--warn)}
+#dpc .gchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}#dpc .gchips button{font-size:12px;padding:3px 9px}#dpc .cl{margin:8px 0 0;padding-left:18px;max-height:40vh;overflow:auto;font-size:14px}
+.swdel{font-size:12px;padding:2px 8px;color:var(--err)}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none}
+
+.stat.warn b{color:var(--warn)}.stat.err b{color:var(--err)}.stat.ok b{color:var(--ok)}
+</style></head><body>
+<header><h1>RDS · устройства</h1><div class="r">
+<input type="search" id="q" placeholder="Поиск: ID, имя ПК, имя и фамилия, IP, заметка"><span id="hdrx"><button id="adBtn" class="adm" title="Вход через Active Directory">…</button><a class="b p adm" id="dlMe" href="/admin/api/installer" title="Windows-установщик: RustDesk будет сразу в вашем аккаунте панели">⬇ Скачать RustDesk</a><a class="b" id="cl" target="_blank" rel="noopener">Страница установки ↗</a><span class="mut" id="meName"></span><button id="out">Выйти</button></span><button id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Настройки" title="Настройки">☰</button></div></header>
+<div id="menu" role="menu" aria-label="Настройки"><div class="mh">Какой IP показывать</div><span class="seg" id="ipm"><button data-v="l">Локальный IP</button><button data-v="e">Внешний IP</button></span><div class="mh adm">Подключение</div><label class="sw adm" id="dcSw" title="Выкл: кнопки подключения и пароля (замок) скрыты у всех, включая администраторов"><input type="checkbox" id="dc"><i></i>Прямое подключение</label><label class="sw" id="fmtSw" title="Вкл: ID@&lt;ваш сервер&gt;?key=… — подключение через наш сервер с ключом, независимо от настроек вашего RustDesk. Выкл: обычный ID."><input type="checkbox" id="fmt"><i></i>Спец. формат</label><div class="mh adm">Агенты на ПК</div><label class="sw adm" title="Вкл: администратор без 2FA не может запускать задания, выключать ПК, менять пользователей, права и настройки"><input type="checkbox" id="a2fa"><i></i>2FA обязательна для администраторов</label><label class="sw adm" title="Вкл: агенты без своего ключа отклоняются (общий токен из публичных скриптов больше не работает). Новые установки привязываются автоматически в течение часа."><input type="checkbox" id="akStrict"><i></i>Только привязанные агенты</label><span class="mut adm" id="akInfo" style="display:block;margin:2px 0 6px"></span><div class="mh adm">Резервные копии базы</div><div class="adm pwset"><label>Каталог для копий на сервере<input type="text" id="bkD" placeholder="/opt/RDS/data/backup" title="Только внутри /mnt, /media, /srv, /backup, /home или /opt/RDS/data/backup. Сетевой диск: смонтируйте в /mnt/… и укажите путь"></label><label>Делать копию раз в, часов<input type="number" id="bkE" min="1" max="168" step="1"></label><label>Хранить, дней<input type="number" id="bkK" min="1" max="3650" step="1"></label><label>Предельный общий размер, МБ<input type="number" id="bkM" min="50" step="50"></label><span class="mut pwh" id="bkInfo"></span><span class="pwb"><button id="bkVault" type="button">🔐 Шифрование и хранилища…</button><button id="bkNow" type="button">Сделать копию сейчас</button><button id="bkSave" class="p" type="button">Сохранить</button></span></div><div class="mh adm">Выключение и перезагрузка</div><div class="adm pwset"><label>Выключение через, секунд<input type="number" id="pwSd" min="0" max="86400" step="1"></label><label>Перезагрузка через, секунд<input type="number" id="pwRd" min="0" max="86400" step="1"></label><label>Сообщение пользователю<textarea id="pwMsg" rows="4" maxlength="500"></textarea></label><span class="mut pwh">{действие} → «выключен» / «перезагружен», {время} → задержка («5 мин»). До 500 символов.</span><span class="pwb"><button id="pwDef" type="button">По умолчанию</button><button id="pwSave" class="p" type="button">Сохранить</button></span></div><div class="mh">Мой вход</div><button id="alogBtn" type="button" class="adm">📜 Журнал действий администраторов</button><button id="tfaBtn" type="button">🔐 Двухфакторная защита…</button><div id="menuMore"></div></div>
+<div class="mb" id="alogm"><div class="md wide" role="dialog" aria-modal="true"><button class="x" id="alogx" aria-label="Закрыть">✕</button><h3>Журнал действий администраторов</h3><p class="mut">Входы, подтверждения кодом и опасные действия (задания ПО, питание, пользователи, права, настройки, AD, ключи агентов). ✗ — действие отклонено (не было кода 2FA). Хранится год.</p><div class="tw" style="max-height:60vh;overflow:auto"><table style="min-width:640px"><thead><tr><th>Когда</th><th>Кто</th><th>IP</th><th>Действие</th><th>Куда</th></tr></thead><tbody id="alogb"></tbody></table></div></div></div>
+<div class="mb" id="vlm"><div class="md wide" role="dialog" aria-modal="true"><button class="x" id="vlx" aria-label="Закрыть">✕</button><div id="vlc"></div></div></div>
+<div class="mb" id="tfam"><div class="md" role="dialog" aria-modal="true" style="max-width:420px"><button class="x" id="tfax" aria-label="Закрыть">✕</button><div id="tfac"></div></div></div>
+<main>
+<div class="tabs main adm"><button class="on" data-tab="dev">Устройства</button><button data-tab="usr">Пользователи</button><button data-tab="grp">Группы</button><button data-tab="role">Шаблоны прав</button><button data-tab="sw">ПО</button><button data-tab="ad">Домен (AD / FreeIPA)</button></div>
+<div id="tabDev">
+<div id="nb" role="status" aria-live="polite"><span style="font-size:20px">🔔</span><div class="t" id="nbT"></div>
+<button id="nbPerm" hidden>Уведомлять в браузере</button><button class="p" id="nbOk">Понятно</button></div>
+<div class="stats"><div class="stat"><b id="sAll">—</b><span>всего</span></div><div class="stat"><b id="sOn">—</b><span>в сети</span></div>
+<div class="stat"><b id="sInst">—</b><span>через установщик</span></div><div class="stat"><b id="sOld">—</b><span>старые (только hbbs)</span></div></div>
+<div id="bulk"><b id="bulkN"></b><button class="p" id="bulkSw">Установить / удалить ПО…</button><button class="d adm" id="bulkDel">Удалить…</button><button id="bulkClr">Снять выбор</button></div>
+<div class="colhint"><span>Столбцы можно перетаскивать за заголовок</span><button id="colReset" title="Вернуть исходный порядок столбцов">Сбросить порядок</button></div>
+<div class="tw"><table><thead><tr id="thr"></tr></thead><tbody id="tb"></tbody></table></div>
+</div>
+<div id="tabUsr" hidden>
+<p class="hint">Эти учётные записи работают в RustDesk (Настройки → Аккаунт → Войти) и в этой панели. Пользователь видит в панели только компьютеры своих групп, без управления; подключаться и видеть пароли клиентов он может, только если это разрешено в столбце «Права» (ему или его группе). Тумблер «Прямое подключение» вверху выключает всем, включая администраторов, и подключение, и пароли. Администратор видит в RustDesk все компьютеры, пользователь — компьютеры всех своих групп (их может быть несколько: нажмите на ячейку «Группы»). Группа компьютера задаётся на вкладке «Устройства».</p>
+<form class="uf" id="uf" autocomplete="off">
+<label>Логин<input type="text" id="uName" required placeholder="ivan"></label>
+<label>Имя<input type="text" id="uDisp" placeholder="Иван"></label>
+<label>Пароль<input type="password" id="uPw" autocomplete="new-password" placeholder="мин. 8 символов"></label>
+<label>Группы<input type="text" id="uGrp" placeholder="через запятую: Офис, Склад"></label>
+<label class="ck"><input type="checkbox" id="uAdm"> Администратор</label>
+<button class="p" id="uSave">Сохранить</button>
+</form>
+<div class="bulkr" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 8px"><span class="mut" id="ubN">Отметьте пользователей, чтобы назначить шаблон сразу нескольким</span><select id="ubRole"></select><button id="ubApply">Назначить выбранным</button></div>
+<div class="tw"><table style="min-width:640px"><thead><tr><th class="ck"><input type="checkbox" id="ubAll" title="Выбрать всех"></th><th>Логин</th><th>Имя</th><th>Роль</th><th>Группы</th><th title="Шаблон прав пользователя; права из групп и AD добавляются к нему">Шаблон прав</th><th>Компьютеры</th><th>Последний вход</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
+<h2 style="font-size:16px;margin:22px 0 8px">Входы в RustDesk</h2>
+<p class="hint">Каждый вход в аккаунт с компьютера и каждый скачанный личный установщик — отдельный ключ доступа. Отзовите ключ, если компьютер или установщик попал в чужие руки.</p>
+<div class="tw"><table style="min-width:600px"><thead><tr><th>Пользователь</th><th>Откуда</th><th>Создан</th><th>Последнее использование</th><th></th></tr></thead><tbody id="tkb"></tbody></table></div>
+</div>
+<div id="tabGrp" hidden>
+<p class="hint">Группа объединяет пользователей и компьютеры: пользователь видит в RustDesk («Доступные устройства») все компьютеры своей группы. Пользователь и компьютер могут быть в нескольких группах; администраторы видят всё и без групп.</p>
+<form class="uf" id="gf" autocomplete="off">
+<label>Название<input type="text" id="gName" required maxlength="60" placeholder="например, Офис"></label>
+<label style="grid-column:span 2">Заметка<input type="text" id="gNote" maxlength="300" placeholder="необязательно"></label>
+<button class="p">Создать группу</button>
+</form>
+<div class="tw"><table style="min-width:640px"><thead><tr><th>Группа</th><th>Заметка</th><th title="Шаблон прав для всех участников группы">Шаблон прав</th><th>Пользователи</th><th>Компьютеры</th><th></th></tr></thead><tbody id="gb"></tbody></table></div>
+</div>
+<div id="tabRole" hidden>
+<p class="hint">Шаблон — набор прав, который назначается одним выбором: пользователю (вкладка «Пользователи»), группе (вкладка «Группы») или группе AD (вкладка «Домен»). Права пользователя — сумма всех его шаблонов; действуют только на компьютеры его групп. Опасные действия (выключение, установка ПО, обновление) требуют кода 2FA и пишутся в журнал. «Администратор» — все права и все компьютеры, его не изменить.</p>
+<div style="margin:0 0 10px"><button class="p" id="roleNew">+ Новый шаблон</button></div>
+<div class="tw"><table style="min-width:760px"><thead><tr id="roleHd"></tr></thead><tbody id="roleB"></tbody></table></div>
+</div>
+<div id="tabSw" hidden>
+<div class="tabs" id="swOs" style="margin-bottom:8px"><button data-os="windows">Windows</button><button data-os="linux">Linux</button><button data-os="mac">macOS</button></div>
+<div class="tabs" id="swTabs"><button class="on" data-st="inv">Установленное</button><button data-st="cat">Каталог</button><button data-st="jobs">Задания</button></div>
+<div id="swInv">
+<p class="hint">Что установлено на компьютерах (по данным агентов). Откройте программу, чтобы увидеть, где и какой версии она стоит; «Удалить…» — снять её с выбранных ПК, «Обновить…» — если такая программа есть в каталоге. Установка новых программ — в «Каталоге».</p>
+<p class="hint" id="invMiss" hidden></p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px"><input type="search" id="invQ" placeholder="Поиск по названию или издателю" style="flex:1;min-width:220px"><button id="invR">Обновить список</button></div>
+<p class="mut" id="invC" style="margin:0 0 6px"></p>
+<div class="tw"><table style="min-width:760px"><thead><tr><th>Программа</th><th>ОС</th><th>Версии</th><th>Где стоит</th><th></th></tr></thead><tbody id="invB"></tbody></table></div>
+</div>
+<div id="swCat" hidden>
+<p class="hint">Каталог программ для развёртывания. Для каждой программы задаётся свой способ установки и параметры; потом её можно поставить, обновить или удалить на выбранных компьютерах (по одному, галочками или целыми группами). Агент на ПК забирает задание в течение минуты и выполняет его от имени SYSTEM / root; результат появится в таблице «Задания». Каждое действие — с подтверждением.</p>
+<form class="uf" id="pf" autocomplete="off" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">
+<input type="hidden" id="pId">
+<label>Название<input type="text" id="pName" required maxlength="120" placeholder="например, 7-Zip"></label>
+<label>Платформа<select id="pPlat"><option value="windows">Windows</option><option value="linux">Linux</option><option value="mac">macOS</option></select></label>
+<label>Тип установки<select id="pKind"></select></label>
+<label style="grid-column:1/-1"><span id="pSrcT">Источник</span><textarea id="pSrc" rows="2"></textarea></label>
+<label id="pFileL">Файл установщика (загрузится в панель)<input type="file" id="pFile"><span class="mut" id="pFileI"></span></label>
+<label>Параметры установки<input type="text" id="pArgs"></label>
+<label id="pCfgL" style="grid-column:1/-1">Ответы установщику пакета (debconf-set-selections, только apt)<textarea id="pCfg" rows="2" placeholder="tzdata tzdata/Areas select Europe"></textarea></label>
+<label style="grid-column:1/-1">Скрипт после установки (настройки, конфиги) — выполняется после успешной установки и обновления<textarea id="pPost" rows="3"></textarea></label>
+<label>Удаление<select id="pUk"><option value="">автоматически</option><option value="cmd">своя команда</option><option value="script">скрипт</option></select></label>
+<label><span id="pUaT">Доп. параметры удаления</span><input type="text" id="pUa"></label>
+<label>Имя в «Установленное ПО» (для удаления)<input type="text" id="pDet" placeholder="как в списке программ ПК"></label>
+<label>Заметка<input type="text" id="pNote" maxlength="500"></label>
+<div style="display:flex;gap:8px;align-items:end"><button class="p" id="pSave">Сохранить</button><button type="button" id="pClear">Очистить</button></div>
+</form>
+<div class="tw"><table style="min-width:760px"><thead><tr><th>Программа</th><th>Платформа</th><th>Тип</th><th>Источник</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
+</div>
+<div id="swJobs" hidden>
+<div class="tw"><table style="min-width:760px"><thead><tr><th>Когда</th><th>Компьютер</th><th>Программа</th><th>Действие</th><th>Статус</th><th>Результат</th><th></th></tr></thead><tbody id="jb"></tbody></table></div>
+</div>
+</div>
+<div class="mb" id="dpm"><div class="md wide" role="dialog" aria-modal="true"><button class="x" id="dpx" aria-label="Закрыть">✕</button><div id="dpc"></div></div></div>
+<div id="tabAd" hidden>
+<p class="hint">Вход в панель и в RustDesk учётными записями домена. Сначала проверяются локальные пользователи, затем AD. Пустить можно только участников групп с префиксом (например, «RDS Office» → группа панели «Office»); участники группы администраторов становятся администраторами. Группы таких пользователей берутся из AD при каждом входе, пароль меняется в AD.</p>
+<form class="uf" id="adf" autocomplete="off" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+<label>Тип каталога<select id="adKind" style="padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"><option value="ad">Windows AD</option><option value="freeipa">FreeIPA</option></select></label>
+<label>Сервер<input type="text" id="adUrl" placeholder="ldap://dc.corp.local:389 или ldaps://…:636"></label>
+<label>Base DN<input type="text" id="adBase" placeholder="DC=corp,DC=local"></label>
+<label>Сервисная учётка<input type="text" id="adBind" placeholder="svc-rds@corp.local"></label>
+<label>Пароль сервисной учётки<input type="password" id="adPw" autocomplete="new-password"></label>
+<label>Группа администраторов<input type="text" id="adAdm" placeholder="RDS Admins"></label>
+<label>Префикс групп<input type="text" id="adPre" placeholder="RDS "></label>
+<label class="ck"><input type="checkbox" id="adOn"> Вход через AD включён</label>
+<label class="ck" title="Доменный пользователь с верным паролем, не попавший ни в одну сопоставленную группу, ждёт решения администратора (ниже), а не получает отказ"><input type="checkbox" id="adAppr"> Вход по одобрению администратора</label>
+<button class="p" id="adSave">Сохранить</button>
+</form>
+<div class="uf" style="margin-top:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+<label>Проверить пользователя<input type="text" id="adTL" placeholder="логин (можно пусто)" autocomplete="off"></label>
+<label>Пароль (необязательно)<input type="password" id="adTP" autocomplete="new-password"></label>
+<button id="adTest">Проверить</button>
+</div>
+<pre id="adOut" style="white-space:pre-wrap;min-height:2em"></pre>
+<h2 style="font-size:16px;margin:22px 0 8px">Сопоставление групп AD</h2>
+<p class="hint">Участники группы AD получают указанные группы компьютеров и шаблон прав. Пересчитывается при каждом входе: убрали человека из группы в AD — доступ пропал. Префикс групп выше продолжает работать.</p>
+<form class="uf" id="amf" autocomplete="off" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"><input type="hidden" id="amId">
+<label>Группа AD<input type="text" id="amAd" placeholder="ИТ-Поддержка" required></label>
+<label>Группы компьютеров<input type="text" id="amPg" placeholder="через запятую: Офис, Склад"></label>
+<label>Шаблон прав<select id="amRole"></select></label>
+<button class="p">Сохранить</button></form>
+<div class="tw"><table style="min-width:600px"><thead><tr><th>Группа AD</th><th>Группы компьютеров</th><th>Шаблон</th><th></th></tr></thead><tbody id="amB"></tbody></table></div>
+<h2 style="font-size:16px;margin:22px 0 8px">Ожидают одобрения <span class="mut" id="apN"></span></h2>
+<div class="tw"><table style="min-width:640px"><thead><tr><th>Логин</th><th>Имя</th><th>Группы в AD</th><th>Когда</th><th>Шаблон</th><th>Группы компьютеров</th><th></th></tr></thead><tbody id="apB"></tbody></table></div>
+</div>
+<div class="mb" id="gm"><div class="md wide" role="dialog" aria-modal="true"><button class="x" id="gmx" aria-label="Закрыть">✕</button>
+<h3>Группа «<span id="gmName"></span>»</h3><p class="sub">Отметьте, кто и что входит в группу. Пользователь и компьютер при этом остаются и в своих других группах.</p>
+<div class="tabs" style="margin:0"><button class="on" type="button" data-gt="u">Пользователи</button><button type="button" data-gt="d">Компьютеры</button></div>
+<input type="search" id="gmQ" placeholder="Поиск">
+<div class="dl" id="gmList"></div>
+<div class="row"><span class="mut" id="gmCnt" style="margin-right:auto;align-self:center"></span><button id="gmCancel">Отмена</button><button class="p" id="gmSave">Сохранить</button></div></div></div>
+<datalist id="grpList"></datalist>
+<div id="upop" role="dialog" aria-label="Пользователи компьютера"></div><div id="gpop" role="dialog" aria-label="Группы пользователя"><div class="gh" id="gpopT"></div><div class="gl" id="gpopL"></div><div class="gn"><input type="text" id="gpopN" placeholder="+ новая группа, Enter"></div></div>
+<div class="mb" id="um"><div class="md wide" role="dialog" aria-modal="true"><button class="x" id="umx" aria-label="Закрыть">✕</button>
+<h3>Компьютеры пользователя <span id="umName"></span></h3><p class="sub">Отмеченные компьютеры пользователь увидит в RustDesk (вкладка «Доступные устройства»). Компьютеры его группы видны ему и без отметки.</p>
+<input type="search" id="umQ" placeholder="Поиск: ID, имя компьютера">
+<div class="dl" id="umList"></div>
+<div class="row"><button id="umCancel">Отмена</button><button class="p" id="umSave">Сохранить</button></div></div></div>
+<section class="build adm"><h2>Установщики</h2><div id="bs" class="mut">—</div>
+<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="p" id="rb">Проверить версию и пересобрать</button></div><pre id="bl"></pre></section>
+</main><div id="toast"></div>
+<div class="mb" id="adm"><div class="md wide" role="dialog" aria-modal="true"><button class="x" id="admx" aria-label="Закрыть">✕</button><div id="admc"></div></div></div>
+<div class="mb" id="hwm"><div class="md hw" role="dialog" aria-modal="true"><button class="x" id="hwx" aria-label="Закрыть">✕</button><div id="hwc"></div></div></div>
+<div class="mb" id="mb"><div class="md" role="dialog" aria-modal="true"><button class="x" id="mx" aria-label="Закрыть">✕</button>
+<h3>Подключение к <span id="mId"></span></h3><p class="sub" id="mHost"></p>
+<a class="go" id="mGo">Открыть в RustDesk</a>
+</div></div>
+<script>
+// ---------------- подтверждение опасных действий кодом 2FA: панель отвечает 403 {detail:{need_elev}} → спросить код → повторить
+(()=>{const of=window.fetch.bind(window);let pend=null;
+ async function elevate(){if(pend)return pend;pend=(async()=>{for(let k=0;k<3;k++){const c=window.prompt((k?'Неверный код. ':'')+'Подтвердите действие: 6-значный код из приложения-аутентификатора (действует 15 минут)');if(c===null)return false;
+   const r=await of('/admin/api/me/elevate',{method:'POST',headers:{'X-RDS':'1','Content-Type':'application/json'},body:JSON.stringify({code:c})});if(r.ok)return true;if(r.status==429){alert('Слишком много попыток, подождите 15 минут');return false}
+   if(r.status==409){const d=await r.json().catch(()=>({}));alert(d.detail||'Часы расходятся — введите следующий код');k--}}return false})();
+  try{return await pend}finally{pend=null}}
+ window.rdsElevate=elevate;
+ window.fetch=async(u,o)=>{const r=await of(u,o);if(r.status!=403)return r;let d=null;try{d=await r.clone().json()}catch(_){return r}
+  if(!(d&&d.detail&&d.detail.need_elev))return r;if(!await elevate())return new Response(JSON.stringify({detail:'Действие отменено: нужен код 2FA'}),{status:403,headers:{'Content-Type':'application/json'}});return of(u,o)}})();
+
+let DOWN=null;document.addEventListener('mousedown',e=>{DOWN=e.target},true);
+const $=s=>document.querySelector(s),H={'X-RDS':'1','Content-Type':'application/json'};let all=[],now=0,SRV={rds:'',key:''};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t){const e=$('#toast');e.textContent=t;e.style.opacity=1;clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity=0,1600)}
+function ago(t){if(!t)return'—';const s=now-t;if(s<60)return'только что';if(s<3600)return Math.floor(s/60)+' мин назад';if(s<86400)return Math.floor(s/3600)+' ч назад';
+ return new Date(t*1000).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}
+async function api(u,o){const r=await fetch(u,o);if(r.status==401){location.reload();throw 0}if(!r.ok)throw new Error(r.status);return r.json()}
+let IPM='l';try{IPM=localStorage.getItem('rds_ipm')||'l'}catch(_){}
+function ipmUI(){document.querySelectorAll('#ipm button').forEach(b=>b.classList.toggle('on',b.dataset.v==IPM))}ipmUI();
+$('#ipm').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;IPM=b.dataset.v;try{localStorage.setItem('rds_ipm',IPM)}catch(_){};ipmUI();draw()});
+const isPriv=ip=>/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.|169\.254\.|f[cd]|fe80)/i.test(ip||'');
+function ipCell(x){const ext=x.ext_ip||(x.last_ip&&!isPriv(x.last_ip)?x.last_ip:''),loc=x.local_ip||'';
+ const tip='Локальный: '+(loc||'неизвестен — появится после переустановки новым установщиком')+'\nВнешний: '+(ext||'неизвестен')+(x.last_ip?'\nПоследний запрос с: '+x.last_ip:'');
+ const v=IPM=='l'?loc:ext;return `<span title="${esc(tip)}" class="id" style="font-size:13px;font-weight:500">${v?esc(v):'<span class="mut" style="opacity:.6">—</span>'}</span>`}
+const fmt=$('#fmt');try{fmt.checked=(localStorage.getItem('rds_fmt2')??'0')=='1'}catch(_){fmt.checked=false}
+fmt.onchange=()=>{try{localStorage.setItem('rds_fmt2',fmt.checked?'1':'0')}catch(_){};toast(fmt.checked?'Спец. формат: ID@rds?key=…':'Обычный ID')};
+function addr(i){return fmt.checked&&SRV.rds?i+'@'+SRV.rds+(SRV.key?'?key='+SRV.key:''):i}
+const NEW=new Set();let KNOWN=null;
+function lsGet(k){try{return localStorage.getItem(k)}catch(_){return null}}function lsSet(k,v){try{localStorage.setItem(k,v)}catch(_){}}
+function checkNew(){const ids=all.filter(x=>x.source!='hbbs').map(x=>x.id);
+ if(KNOWN===null){const raw=lsGet('rds_known_ids');KNOWN=new Set(raw?JSON.parse(raw):ids);if(!raw)lsSet('rds_known_ids',JSON.stringify([...KNOWN]))}
+ const fresh=ids.filter(i=>!KNOWN.has(i)&&!NEW.has(i));fresh.forEach(i=>NEW.add(i));
+ if(NEW.size){const list=[...NEW].map(i=>{const x=all.find(y=>y.id==i)||{};return `<b>${esc(x.hostname||i)}</b> <span class="mut">${esc(i)} · ${esc((x.os||'').split(' / ')[0])}${x.username?' · '+esc(x.username):''}</span>`});
+  $('#nbT').innerHTML=(NEW.size==1?'Новый клиент: ':'Новые клиенты ('+NEW.size+'): ')+list.join(', ');$('#nb').classList.add('on');
+  $('#nbPerm').hidden=!('Notification' in window)||Notification.permission!='default'}
+ if(fresh.length){document.title='('+NEW.size+') RDS · устройства';
+  if('Notification' in window&&Notification.permission=='granted')fresh.forEach(i=>{const x=all.find(y=>y.id==i)||{};try{new Notification('RDS: новый клиент',{body:(x.hostname||i)+' — ID '+i+(x.os?' · '+x.os.split(' / ')[0]:''),tag:'rds-'+i})}catch(_){}})}}
+$('#nbOk').onclick=()=>{NEW.forEach(i=>KNOWN.add(i));lsSet('rds_known_ids',JSON.stringify([...KNOWN]));NEW.clear();$('#nb').classList.remove('on');document.title='RDS · устройства';draw()};
+$('#nbPerm').onclick=async()=>{try{await Notification.requestPermission()}catch(_){};$('#nbPerm').hidden=Notification.permission!='default'};
+let LATEST='';
+let SKEW=0;
+function tick(){const t=Date.now()/1000+SKEW;document.querySelectorAll('.cd').forEach(el=>{const left=Math.round(+el.dataset.dl-t);
+ el.textContent=left>0?el.dataset.lbl+' через '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0'):el.dataset.done})}
+setInterval(tick,1000);
+async function load(){const d=await api('/admin/api/devices');all=d.devices;now=d.now;SKEW=d.now-Date.now()/1000;LATEST=d.latest||'';if(ADM)checkNew();draw();
+ $('#sAll').textContent=all.length;$('#sOn').textContent=all.filter(x=>x.online).length;
+ $('#sInst').textContent=all.filter(x=>x.source=='installer').length;$('#sOld').textContent=all.filter(x=>x.source=='hbbs').length}
+// «windows / Windows 11 Pro - 11 (28000)» → «Windows 11 Pro (26H1)»; «macos / MacOS 15.8.3» → «macOS 15.8.3 (Sequoia)»; «debian / Linux 13 Debian GNU/Linux» → «Debian 13 (Trixie)»
+function fmtOS(o){if(!o)return'';const raw=o.includes(' / ')?o.split(' / ').slice(1).join(' / '):o,fam=o.split(' / ')[0].toLowerCase();
+ if(fam.startsWith('windows')||/windows/i.test(raw)){const m=raw.match(/Windows\s*(\d+)\s*([A-Za-z ]*?)\s*-\s*\d+\s*\((\d+)\)/i);
+  if(m){let [,v,ed,b]=m;b=+b;if(v=='10'&&b>=22000)v='11';const W10={10240:'1507',10586:'1511',14393:'1607',15063:'1703',16299:'1709',17134:'1803',17763:'1809',18362:'1903',18363:'1909',19041:'2004',19042:'20H2',19043:'21H1',19044:'21H2',19045:'22H2'};
+   const W11=[[28000,'26H1'],[26200,'25H2'],[26100,'24H2'],[22631,'23H2'],[22621,'22H2'],[22000,'21H2']];
+   const rel=v=='11'?(W11.find(([k])=>b>=k)||[0,''])[1]:v=='10'?(W10[b]||''):({7600:'RTM',7601:'SP1',9200:'',9600:''}[b]??'');return 'Windows '+v+(ed.trim()?' '+ed.trim():'')+(rel?' ('+rel+')':' (сборка '+b+')')}
+  return raw.replace(/^Windows/i,'Windows')}
+ if(fam.startsWith('mac')||/mac/i.test(raw)){const m=raw.match(/(\d+)(\.\d+)*/);if(!m)return'macOS';const N={11:'Big Sur',12:'Monterey',13:'Ventura',14:'Sonoma',15:'Sequoia',26:'Tahoe'};
+  return 'macOS '+m[0]+(N[+m[1]]?' ('+N[+m[1]]+')':'')}
+ const D={'9':'Stretch','10':'Buster','11':'Bullseye','12':'Bookworm','13':'Trixie','14':'Forky'},U={'20.04':'Focal','22.04':'Jammy','24.04':'Noble','24.10':'Oracular','25.04':'Plucky','25.10':'Questing','26.04':'Resolute'};
+ let m=raw.match(/Linux\s+([\d.]+)\s+(Debian|Ubuntu|Linux Mint|Fedora|Arch|Alt|Astra|RED OS|openSUSE|CentOS|Rocky|AlmaLinux)/i);
+ if(m){const v=m[1],d=m[2];if(/debian/i.test(d))return 'Debian '+v+(D[v.split('.')[0]]?' ('+D[v.split('.')[0]]+')':'');if(/ubuntu/i.test(d))return 'Ubuntu '+v+(U[v]?' ('+U[v]+')':'');return d+' '+v}
+ return raw||o}
+const SEL=new Set();let SHOWN=[];
+let SORT={k:'',d:1};try{SORT=JSON.parse(localStorage.getItem('rds_sort'))||SORT}catch(_){}
+const SK={ver:x=>vt(x.version).map(n=>String(n).padStart(5,'0')).join('.'),id:x=>+x.id||0,ip:x=>(IPM=='l'?(x.local_ip||''):(x.ext_ip||x.last_ip||'')).split('.').map(n=>n.padStart(3,'0')).join('.'),host:x=>(x.hostname||'').toLowerCase(),os:x=>(x.os||'').toLowerCase()+' '+(x.version||''),
+ user:x=>(x.person_ad||x.person||pcUsers(x).main).toLowerCase(),acc:x=>x.source=='hbbs'?3:(x.master?0:(x.master===0?1:2)),grp:x=>((x.groups||[])[0]||'\uffff').toLowerCase(),
+ last:x=>x.online?-1e12:-(x.last_seen||x.installed_at||0),note:x=>(x.note||'\uffff').toLowerCase()};
+function sorted(list){if(!SORT.k||!SK[SORT.k])return list;const f=SK[SORT.k];
+ return [...list].sort((a,b)=>(!!b.fav-!!a.fav)||((f(a)>f(b)?1:f(a)<f(b)?-1:0)*SORT.d))}
+function sortHdr(){document.querySelectorAll('th[data-sort]').forEach(t=>{t.classList.toggle('asc',t.dataset.sort==SORT.k&&SORT.d==1);t.classList.toggle('desc',t.dataset.sort==SORT.k&&SORT.d==-1)})}
+let ME={username:'',is_admin:false,perms:{}},ADM=false;
+const IC={conn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>',
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'};
+// пользователи ПК: кто запустил установщик RustDesk (основной) + учётки с ПК + кто вошёл сейчас
+function pcUsers(x){const strip=v=>String(v||'').split('\\').pop().trim();const logged=strip(x.logged_user);
+ const seen=new Set(),list=[];[strip(x.inst_user||x.username),...String(x.pc_users||'').split(/[;,]\s*/).map(strip),logged,strip(x.username)].forEach(n=>{if(n&&!seen.has(n.toLowerCase())){seen.add(n.toLowerCase());list.push(n)}});
+ return {main:list[0]||'',logged,list}}   // основной — кто ставил RustDesk; если неизвестен — первая учётка ПК
+function userCell(x){if(x.source=='hbbs')return '<span class="mut">—</span>';const u=pcUsers(x),others=u.list.filter(n=>n.toLowerCase()!=u.main.toLowerCase());
+ const name=x.person_ad||x.person||'',more=others.length?`<button class="more" data-c="users" data-id="${esc(x.id)}" title="Все пользователи этого ПК">+${others.length}</button>`:'';
+ const edit=ADM&&!x.domain?`<button class="pen" data-c="person" data-id="${esc(x.id)}" title="${name?'Изменить':'Указать'} имя и фамилию">✏️</button>`:'';
+ const ad=x.domain?`<span class="chip" title="ПК в домене ${esc(x.domain)}${x.person_ad?' — имя из каталога':' — имя появится из AD/FreeIPA, если панель введена в этот домен'}">${esc(x.domain)}</span>`:'';
+ const login=u.main?esc(u.main):'<span class="mut">—</span>';
+ return name?`<div class="ucell"><b style="font-weight:600">${esc(name)}</b>${edit}</div><div class="ucell mut">${login}${ad}${more}</div>`
+  :`<span class="ucell">${login}${ad}${more}${edit}</span>`}
+function grpChips(g){return (g||[]).map(v=>`<span class="chip">${esc(v)}</span>`).join('')||'<span class="mut">—</span>'}
+function accCell(x){return x.source=='hbbs'?'<span class="chip w">старый клиент — переустановить</span>':(x.master?'<span class="chip">мастер-пароль</span>':(x.master===0&&x.want_master===1?'<span class="chip w" title="Скачан вариант с постоянным паролем, но RustDesk его не принял — переустановите текущим установщиком">пароль не установился</span>':(x.master===0?'<span class="chip">одноразовый</span>':'<span class="chip">неизвестно</span>')))}
+function connCell(x){if(x.source=='hbbs')return '';const id=esc(x.id),P=ME.perms||{};let h='';
+ if(P.connect)h+=`<button class="cn" data-c="go" data-id="${id}" data-pw="${x.has_password&&P.password?1:0}" title="Подключиться в RustDesk${x.has_password&&P.password?' (с паролем)':''}">${IC.conn}</button>`;
+ if(P.password&&x.has_password)h+=`<button class="lk" data-c="pw" data-id="${id}" title="Скопировать пароль RustDesk">${IC.lock}</button>`;
+ return h?`<span class="pw">${h}</span>`:'<span class="mut">—</span>'}
+const COLS=[
+ {k:'id',t:'ID',s:'id',cls:'idc',r:x=>`${x.source!='hbbs'?`<button class="star ${x.fav?'on':''}" data-c="fav" data-id="${esc(x.id)}" data-on="${x.fav?1:0}" title="${x.fav?'Убрать из избранного':'В избранное (наверх списка и метка «⭐ Избранное» в RustDesk)'}">${x.fav?'★':'☆'}</button>`:''}<span class="dot ${x.online?'on':''}"></span><span class="id cp" data-copy="${esc(x.id)}" title="Скопировать адрес для RustDesk: ID@сервер?key=…">${esc(x.id)}</span>${NEW.has(x.id)?'<span class="newb">новый</span>':''}`},
+ {k:'host',t:'Компьютер',s:'host',r:x=>esc(x.hostname)||'<span class="mut">—</span>'},
+ {k:'user',t:'Пользователь',s:'user',r:userCell},
+ {k:'ip',t:'IP',s:'ip',cls:'ipc',r:x=>ipCell(x)},
+ {k:'os',t:'ОС',s:'os',cls:'osi',tt:x=>fmtOS(x.os)||x.os||'',r:x=>osIcon(x.os)},
+ {k:'ver',t:'ПО',s:'ver',cls:'swc',r:x=>(CAN('update')||CAN('hw'))?swCell(x):(x.source=='hbbs'?'<span class="mut">—</span>':`<span class="v"><abbr title="RustDesk Client" style="text-decoration:none;cursor:help">RDC</abbr> ${esc(x.version||'?')}</span>`)},
+ {k:'hw',t:'Железо',vis:()=>CAN('hw'),r:x=>x.source!='hbbs'?`<button class="hwb" data-c="hw" data-id="${esc(x.id)}" title="Железо, сеть, принтеры, пользователи">Hardware${x.hw_changed?' <span class="chip w" title="Железо менялось за последние 14 дней">изменено</span>':''}</button>`:''},
+ {k:'acc',t:'Доступ',s:'acc',r:accCell},
+ {k:'grp',t:'Группа',s:'grp',r:x=>x.source=='hbbs'?'':(ADM?`<button class="gpick" data-c="dgrp" data-id="${esc(x.id)}" title="Выбрать группы компьютера (можно несколько)">${grpChips(x.groups)}<span class="ar">▾</span></button>`:grpChips(x.groups))+(x.owner?`<div class="mut">👤 ${esc(x.owner)}</div>`:'')},
+ {k:'last',t:'Последний раз',s:'last',r:x=>x.online?'в сети':ago(x.last_seen||x.installed_at)+(x.source=='hbbs'&&x.created_at?'<div class="mut">с '+esc(x.created_at.slice(0,10))+'</div>':'')},
+ {k:'note',t:'Заметка',s:'note',r:x=>ADM?`<input class="note" data-id="${esc(x.id)}" value="${esc(x.note)}" placeholder="—">`:(esc(x.note)||'<span class="mut">—</span>')},
+ {k:'ctl',t:'Управление',vis:()=>CAN('power'),r:x=>pwCell(x)},
+ {k:'conn',t:'Подключение',vis:()=>!!(ME.perms&&(ME.perms.connect||ME.perms.password)),r:connCell},
+];
+const DEFORD=COLS.map(c=>c.k);
+function loadOrder(){let o=[];try{o=JSON.parse(lsGet('rds_cols')||'[]')}catch(_){}o=o.filter(k=>DEFORD.includes(k));
+ DEFORD.forEach((k,i)=>{if(!o.includes(k))o.splice(Math.min(i,o.length),0,k)});return o}   // новые столбцы встают на своё место по умолчанию
+let ORDER=loadOrder();
+function visCols(){return ORDER.map(k=>COLS.find(c=>c.k==k)).filter(c=>c&&(!c.vis||c.vis()))}
+function drawHead(){$('#thr').innerHTML=(SELOK()?'<th class="ck"><input type="checkbox" id="selAll" title="Выбрать все (с учётом поиска)"></th>':'')+
+ visCols().map(c=>`<th draggable="true" data-k="${c.k}"${c.s?` data-sort="${c.s}"`:''} title="Перетащите, чтобы поменять столбцы местами${c.s?' · клик — сортировка':''}">${c.t}</th>`).join('');
+ sortHdr();const sa=$('#selAll');if(sa)sa.onchange=e=>{SHOWN.forEach(i=>e.target.checked?SEL.add(i):SEL.delete(i));draw()}}
+$('#thr').addEventListener('click',e=>{const t=e.target.closest('th[data-sort]');if(!t)return;const k=t.dataset.sort;
+ if(SORT.k!=k)SORT={k,d:1};else if(SORT.d==1)SORT.d=-1;else SORT={k:'',d:1};
+ try{localStorage.setItem('rds_sort',JSON.stringify(SORT))}catch(_){};sortHdr();draw()});
+let DK=null;const thClr=()=>document.querySelectorAll('#thr th').forEach(t=>t.classList.remove('dropl','dropr','dragging'));
+$('#thr').addEventListener('dragstart',e=>{const t=e.target.closest('th[data-k]');if(!t)return;DK=t.dataset.k;t.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',DK)}catch(_){}});
+$('#thr').addEventListener('dragover',e=>{const t=e.target.closest('th[data-k]');if(!t||!DK)return;e.preventDefault();const r=t.getBoundingClientRect(),right=e.clientX>r.left+r.width/2;
+ document.querySelectorAll('#thr th').forEach(x=>{if(x!=t)x.classList.remove('dropl','dropr')});t.classList.toggle('dropl',!right);t.classList.toggle('dropr',right)});
+$('#thr').addEventListener('drop',e=>{const t=e.target.closest('th[data-k]');if(!t||!DK)return;e.preventDefault();const to=t.dataset.k,right=t.classList.contains('dropr');thClr();
+ if(to==DK){DK=null;return}ORDER=ORDER.filter(k=>k!=DK);let i=ORDER.indexOf(to)+(right?1:0);ORDER.splice(i,0,DK);DK=null;lsSet('rds_cols',JSON.stringify(ORDER));drawHead();draw()});
+$('#thr').addEventListener('dragend',()=>{DK=null;thClr()});
+$('#colReset').onclick=()=>{ORDER=[...DEFORD];lsSet('rds_cols',JSON.stringify(ORDER));drawHead();draw();toast('Порядок столбцов сброшен')};
+function rowMatch(x,q){if(!q)return true;const N=s=>String(s||'').toLowerCase().replace(/ё/g,'е');
+ let ou='';try{if(x.owner)ou=((USERS||[]).find(u=>u.username==x.owner)||{}).display_name||''}catch(e){}
+ const t=N([x.id,x.hostname,x.username,x.inst_user,x.pc_users,x.logged_user,x.note,x.last_ip,x.local_ip,x.ext_ip,(x.groups||[]).join(' '),x.owner,ou,x.person,x.person_ad,x.domain].join(' '));
+ return N(q).split(/\s+/).filter(Boolean).every(w=>t.includes(w))}
+function draw(){const q=$('#q').value.trim().toLowerCase(),cols=visCols();
+ const L=sorted(all).filter(x=>rowMatch(x,q));SHOWN=L.map(x=>x.id);
+ $('#tb').innerHTML=L.map(x=>`<tr class="${NEW.has(x.id)?'new':''} ${SEL.has(x.id)?'selr':''}">${SELOK()?`<td class="ck"><input type="checkbox" class="sel" value="${esc(x.id)}" ${SEL.has(x.id)?'checked':''} aria-label="Выбрать ${esc(x.id)}"></td>`:''}${
+  cols.map(c=>`<td${c.cls?` class="${c.cls}"`:''}${c.tt?` title="${esc(c.tt(x))}"`:''}>${c.r(x)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length+1}" class="mut">Пока нет устройств</td></tr>`;bulkUi();tick()}
+function openUpop(btn,x){const u=pcUsers(x),p=$('#upop'),r=btn.getBoundingClientRect();
+ p.innerHTML=`<div class="gh">Пользователи ${esc(x.hostname||x.id)}</div>`+u.list.map(n=>`<div class="ur"><span>${esc(n)}</span>${n.toLowerCase()==u.main.toLowerCase()?'<span class="chip">установил RustDesk</span>':''}${u.logged&&n.toLowerCase()==u.logged.toLowerCase()?`<span class="chip">${x.online?'сейчас вошёл':'входил последним'}</span>`:''}</div>`).join('');
+ p.classList.add('on');const w=p.offsetWidth,h=p.offsetHeight;let left=Math.min(r.left,innerWidth-w-8),top=r.bottom+4;if(top+h>innerHeight-8)top=Math.max(8,r.top-h-4);p.style.left=Math.max(8,left)+'px';p.style.top=top+'px'}
+document.addEventListener('mousedown',e=>{const p=$('#upop');if(p.classList.contains('on')&&!p.contains(e.target)&&!e.target.closest('.more'))p.classList.remove('on')});
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#upop').classList.remove('on')});
+addEventListener('scroll',e=>{if(!$('#upop').contains(e.target))$('#upop').classList.remove('on')},true);
+async function copy(t,m){try{await navigator.clipboard.writeText(t);toast(m)}catch(_){prompt('Скопируйте:',t)}}
+$('#tb').addEventListener('click',async e=>{const cp=e.target.closest('[data-copy]');if(cp){const i=cp.dataset.copy,a=addr(i);copy(a,'Скопировано: '+(a==i?i:i+'@'+SRV.rds+'?key=…'));return}
+ const b=e.target.closest('button');if(!b)return;const id=b.dataset.id;
+ if(b.dataset.c=='go'){let pw='';if(b.dataset.pw=='1'){try{pw=(await api('/admin/api/devices/'+encodeURIComponent(id)+'/password')).password}catch(_){}}
+  const dev=all.find(x=>x.id==id)||{};const qp=pw?'password='+encodeURIComponent(pw):'';
+  const uSp='rustdesk://connection/new/'+encodeURIComponent(id)+(SRV.rds?'@'+SRV.rds:'')+'?'+(SRV.key?'key='+encodeURIComponent(SRV.key)+(qp?'&':''):'')+qp;
+  const uPl='rustdesk://connection/new/'+encodeURIComponent(id)+(qp?'?'+qp:'');
+  $('#mGo').href=fmt.checked?uSp:uPl;
+  $('#mId').textContent=id;$('#mHost').textContent=(dev.hostname||'')+(dev.username?' · '+dev.username:'')+(dev.online?' · в сети':' · не в сети');
+  $('#mb').classList.add('on')}
+ if(b.dataset.c=='id')copy(id,'ID скопирован');
+ if(b.dataset.c=='fav'){const on=b.dataset.on!='1';await api('/admin/api/devices/'+encodeURIComponent(id)+'/fav',{method:'POST',headers:H,body:JSON.stringify({fav:on})});toast(on?'Добавлено в избранное':'Убрано из избранного');load();return}
+ if(b.dataset.c=='users'){const x=all.find(y=>y.id==id);if(x)openUpop(b,x);return}
+ if(b.dataset.c=='dgrp'){const x=all.find(y=>y.id==id);if(x)openGpop(b,x,'d');return}
+ if(b.dataset.c=='person'){const x=all.find(y=>y.id==id);if(!x)return;const v=prompt('Имя и фамилия пользователя '+(x.hostname||x.id)+' ('+(pcUsers(x).main||'—')+'). Пусто — убрать:',x.person||'');if(v===null)return;
+  const r=await fetch('/admin/api/devices/'+encodeURIComponent(id)+'/person',{method:'POST',headers:H,body:JSON.stringify({person:v})});toast(r.ok?'Сохранено':'Ошибка '+r.status);load();return}
+ if(b.dataset.c=='hw'){openHw(id);return}
+ if(b.dataset.c=='sw'){openSw(id);return}
+ if(b.dataset.c=='pwr'){const x=all.find(y=>y.id==id);if(x)askPower(x,b.dataset.a);return}
+ if(b.dataset.c=='upd'){const x=all.find(y=>y.id==id);if(x)askUpd(x);return}
+ if(b.dataset.c=='updc'){await api('/admin/api/devices/'+encodeURIComponent(id)+'/update/cancel',{method:'POST',headers:H});toast('Задание отменено');load();return}
+ if(b.dataset.c=='wake'){b.disabled=true;try{const r=await fetch('/admin/api/devices/'+encodeURIComponent(id)+'/wake',{method:'POST',headers:H});const d=await r.json().catch(()=>({}));
+  toast(r.ok?'Пакет пробуждения отправлен — ПК включится через 10–60 с':(d.detail||('Ошибка '+r.status)))}finally{setTimeout(()=>b.disabled=false,3000)}return}
+ if(b.dataset.c=='pw'){const d=await api('/admin/api/devices/'+encodeURIComponent(id)+'/password');copy(d.password,'Пароль скопирован')}
+ if(b.dataset.c=='del'&&confirm('Удалить '+id+' из панели? Сам RustDesk на компьютере останется, пароль из панели пропадёт.')){await api('/admin/api/devices/'+encodeURIComponent(id),{method:'DELETE',headers:H});load()}});
+$('#tb').addEventListener('change',async e=>{
+ if(e.target.classList.contains('grp')){await api('/admin/api/devices/'+encodeURIComponent(e.target.dataset.id)+'/group',{method:'POST',headers:H,body:JSON.stringify({group:e.target.value})});toast('Группа сохранена');groups();return}
+ if(!e.target.classList.contains('note'))return;
+ await api('/admin/api/devices/'+encodeURIComponent(e.target.dataset.id)+'/note',{method:'POST',headers:H,body:JSON.stringify({note:e.target.value})});toast('Сохранено')});
+$('#q').oninput=draw;
+function bulkUi(){[...SEL].forEach(i=>{if(!all.some(x=>x.id==i))SEL.delete(i)});const n=SEL.size;$('#bulk').classList.toggle('on',n>0);
+ $('#bulkN').textContent='Выбрано: '+n;const vis=SHOWN.filter(i=>SEL.has(i)).length,sa=$('#selAll');if(sa){sa.checked=SHOWN.length>0&&vis==SHOWN.length;sa.indeterminate=vis>0&&vis<SHOWN.length}}
+$('#tb').addEventListener('change',e=>{if(e.target.classList.contains('sel')){e.target.checked?SEL.add(e.target.value):SEL.delete(e.target.value);e.target.closest('tr').classList.toggle('selr',e.target.checked);bulkUi()}});
+$('#bulkClr').onclick=()=>{SEL.clear();draw()};
+$('#bulkDel').onclick=async()=>{const ids=[...SEL];if(!ids.length)return;const names=ids.map(i=>{const x=all.find(y=>y.id==i)||{};return '• '+(x.hostname||'—')+' ('+i+')'}).slice(0,15).join('\n')+(ids.length>15?'\n… и ещё '+(ids.length-15):'');
+ if(!confirm('Удалить '+ids.length+' '+(ids.length==1?'устройство':'устройств(а)')+' из панели?\n\n'+names+'\n\nRustDesk на самих компьютерах останется. Пароли из панели будут стёрты. Если компьютер снова выйдет в сеть, он появится как новый, но без пароля.'))return;
+ const r=await api('/admin/api/devices/delete',{method:'POST',headers:H,body:JSON.stringify({ids})});SEL.clear();toast('Удалено: '+Math.max(r.panel,r.hbbs));load()};
+$('#mx').onclick=()=>$('#mb').classList.remove('on');$('#mb').onclick=e=>{if((e.target.id=='mb'&&DOWN==e.target))$('#mb').classList.remove('on')};
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#mb').classList.remove('on')});
+$('#mGo').addEventListener('click',()=>setTimeout(()=>$('#mb').classList.remove('on'),1500));
+$('#out').onclick=async()=>{await fetch('/logout',{method:'POST',headers:H});location.reload()};
+$('#rb').onclick=async()=>{await api('/admin/api/rebuild',{method:'POST',headers:H});toast('Запущено');setTimeout(st,1500)};
+async function st(){const s=await api('/admin/api/status');$('#cl').href=s.client_url;SRV={rds:s.rds_host,key:s.key};
+ const t=x=>x?new Date(x*1000).toLocaleString('ru-RU'):'—';
+ $('#bs').innerHTML=`RustDesk <b>${esc(s.version||'—')}</b> · проверено ${t(s.checked_at)} · собрано ${t(s.built_at)}${s.busy?' · <b>идёт сборка…</b>':''}${s.error?'<div style="color:var(--err)">'+esc(s.error)+'</div>':''}
+ <div class="mut" style="margin-top:6px">Сервер для клиентов: ${esc(s.rds_host)} · API: ${esc(s.api)}</div><div class="mut">Файлы: ${s.files.map(esc).join(', ')||'—'}</div>`;
+ $('#bl').textContent=(s.log||[]).slice(-12).join('\n');if(s.busy)setTimeout(st,3000)}
+let USERS=[];
+let GPU=null;
+let GPK='u';function openGpop(btn,u,kind){GPU=u;GPK=kind||'u';const p=$('#gpop'),r=btn.getBoundingClientRect();$('#gpopT').textContent='Группы «'+(GPK=='d'?(u.hostname||u.id):u.username)+'»';drawGpop();$('#gpopN').value='';
+ p.classList.add('on');const w=p.offsetWidth,h=p.offsetHeight;let x=Math.min(r.left,innerWidth-w-8),y=r.bottom+4;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-4);
+ p.style.left=Math.max(8,x)+'px';p.style.top=y+'px'}
+function drawGpop(){const mine=new Set(GPU.groups||[]),all=[...new Set([...GROUPS,...mine])].sort((a,b)=>a.localeCompare(b,'ru'));
+ $('#gpopL').innerHTML=all.map(g=>`<label><input type="checkbox" value="${esc(g)}" ${mine.has(g)?'checked':''}>${esc(g)}</label>`).join('')||'<div class="mut" style="padding:6px 12px">Групп пока нет — введите название ниже</div>'}
+async function saveGpop(list){const u=GPU,dev=GPK=='d';
+ const r=await fetch(dev?'/admin/api/devices/'+encodeURIComponent(u.id)+'/group':'/admin/api/users/'+encodeURIComponent(u.username)+'/groups',{method:'POST',headers:H,body:JSON.stringify({groups:list})});
+ if(!r.ok){toast('Ошибка '+r.status);return}const d=await r.json();u.groups=d.groups;u.group=d.groups.join(', ');
+ const cell=document.querySelector(dev?`.gpick[data-c="dgrp"][data-id="${CSS.escape(u.id)}"]`:`.gpick[data-u="${CSS.escape(u.username)}"]`);if(cell)cell.innerHTML=(u.groups.map(g=>`<span class="chip">${esc(g)}</span>`).join('')||'<span class="mut">—</span>')+'<span class="ar">▾</span>';
+ if(d.groups.some(g=>!GROUPS.includes(g)))groups();drawGpop();toast('Группы сохранены')}
+$('#gpopL').addEventListener('change',()=>saveGpop([...document.querySelectorAll('#gpopL input:checked')].map(i=>i.value)));
+$('#gpopN').addEventListener('keydown',e=>{if(e.key!='Enter')return;e.preventDefault();const v=e.target.value.trim();if(!v)return;e.target.value='';
+ saveGpop([...new Set([...(GPU.groups||[]),v])])});
+document.addEventListener('mousedown',e=>{const p=$('#gpop');if(p.classList.contains('on')&&!p.contains(e.target)&&!e.target.closest('.gpick'))p.classList.remove('on')});
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#gpop').classList.remove('on')});
+addEventListener('scroll',e=>{if(!$('#gpop').contains(e.target))$('#gpop').classList.remove('on')},true);
+let GROUPS=[];
+async function groups(){const g=await api('/admin/api/groups');GROUPS=g.groups;$('#grpList').innerHTML=g.groups.map(x=>`<option value="${esc(x)}">`).join('')}
+async function tokens(){const d=await api('/admin/api/tokens');const t=x=>x?new Date(x*1000).toLocaleString('ru-RU'):'—';
+ const dev=id=>{const x=all.find(y=>y.id==id);return x?esc(x.hostname||id)+' <span class="mut">'+esc(id)+'</span>':esc(id)};
+ $('#tkb').innerHTML=d.tokens.map(k=>`<tr><td class="id">${esc(k.username)}</td><td>${(k.client_id||'').startsWith('installer')?'🧩 '+esc(k.client_id):(k.client_id?dev(k.client_id):'<span class="mut">—</span>')}</td>
+ <td>${t(k.created_at)}</td><td>${t(k.last_used)}</td><td><button class="d" data-tk="${esc(k.ref)}">Отозвать</button></td></tr>`).join('')||'<tr><td colspan="5" class="mut">Нет активных входов</td></tr>'}
+$('#tkb').addEventListener('click',async e=>{const b=e.target.closest('button[data-tk]');if(!b)return;
+ if(!confirm('Отозвать ключ? Этот RustDesk выйдет из аккаунта.'))return;await api('/admin/api/tokens/'+b.dataset.tk,{method:'DELETE',headers:H});tokens();toast('Отозвано')});
+$('#dlMe').addEventListener('click',()=>toast('Собираю установщик… Он подключит RustDesk к вашему аккаунту — не передавайте его другим'));
+async function users(){const d=await api('/admin/api/users');USERS=d.users;const t=x=>x?new Date(x*1000).toLocaleString('ru-RU'):'—';
+ await rolesLoad();
+ $('#ub').innerHTML=USERS.map(u=>`<tr><td class="ck"><input type="checkbox" class="usel" value="${esc(u.username)}"></td><td class="id">${esc(u.username)}</td><td>${esc(u.display_name)}</td><td>${u.is_admin?'<span class="chip">администратор</span>':'<span class="chip">пользователь</span>'}${u.source=='ad'?'<span class="chip" title="Учётка из Active Directory: пароль и группы берутся из AD при каждом входе">AD</span>':''}</td>
+ <td><button class="gpick" data-c="grp" data-u="${esc(u.username)}" title="Выбрать группы">${(u.groups||[]).map(g=>`<span class="chip">${esc(g)}</span>`).join('')||'<span class="mut">—</span>'}<span class="ar">▾</span></button></td><td>${roleSel('urole',u.username,u.role,true)}${(u.ad_roles||[]).map(r=>`<span class="chip" title="Из сопоставления групп AD">AD: ${esc(roleTitle(r))}</span>`).join('')}${u.can_connect||u.can_password?`<span class="chip w" title="Старые отдельные галочки: ${u.can_connect?'подключение ':''}${u.can_password?'пароли':''}">+ отдельные права</span>`:''}</td><td>${u.is_admin?'<span class="mut">все</span>':u.devices}</td><td>${t(u.last_login)}</td>
+ <td><div class="acts">${u.is_admin?'':`<button class="p" data-c="devs" data-u="${esc(u.username)}">Компьютеры</button>`}<button data-c="edit" data-u="${esc(u.username)}">Изменить</button>${u.totp?`<button data-c="tfar" data-u="${esc(u.username)}" title="2FA включена. Сбросить, если потерян телефон">🔐 сброс 2FA</button>`:''}${u.username!=ME.username?`<button class="d" data-c="udel" data-u="${esc(u.username)}">✕</button>`:''}</div></td></tr>`).join('')}
+$('#ub').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const u=USERS.find(x=>x.username==b.dataset.u);if(!u)return;
+ if(b.dataset.c=='devs')openDevs(u);
+ if(b.dataset.c=='tfar'){if(!confirm('Выключить двухфакторную защиту у '+u.username+' и завершить его сессии? Делайте это, только если он потерял телефон.'))return;
+  const r=await fetch('/admin/api/users/'+encodeURIComponent(u.username)+'/2fa-reset',{method:'POST',headers:H});toast(r.ok?'2FA сброшена':'Ошибка '+r.status);users();return}
+ if(b.dataset.c=='grp'){openGpop(b,u);return}
+ if(b.dataset.c=='edit'){$('#uName').value=u.username;$('#uDisp').value=u.display_name||'';$('#uGrp').value=(u.groups||[]).join(', ');$('#uAdm').checked=u.is_admin;$('#uPw').value='';$('#uPw').placeholder='оставьте пустым — без изменений';$('#uName').focus()}
+ if(b.dataset.c=='udel'&&confirm('Удалить пользователя '+u.username+'? Он выйдет из RustDesk на всех компьютерах.')){await api('/admin/api/users/'+encodeURIComponent(u.username),{method:'DELETE',headers:H});users();toast('Удалено')}});
+async function savePerm(el,kind){const box=el.closest('.perm'),key=kind=='u'?'data-pu':'data-pg',name=el.getAttribute(key);
+ const v=f=>box.querySelector(`[data-f=${f}]`).checked;
+ const r=await fetch('/admin/api/'+(kind=='u'?'users':'groups')+'/'+encodeURIComponent(name)+'/perms',{method:'POST',headers:H,body:JSON.stringify({can_connect:v('can_connect'),can_password:v('can_password')})});
+ toast(r.ok?'Права сохранены':'Ошибка '+r.status);if(!r.ok)el.checked=!el.checked}
+$('#ub').addEventListener('change',e=>{if(e.target.matches('[data-pu]'))savePerm(e.target,'u')});
+$('#gb').addEventListener('change',e=>{if(e.target.matches('[data-pg]'))savePerm(e.target,'g')});
+$('#uf').onsubmit=async e=>{e.preventDefault();
+ const r=await fetch('/admin/api/users',{method:'POST',headers:H,body:JSON.stringify({username:$('#uName').value.trim(),display_name:$('#uDisp').value,password:$('#uPw').value,groups:$('#uGrp').value.split(',').map(x=>x.trim()).filter(Boolean),is_admin:$('#uAdm').checked})});
+ if(!r.ok){let d={};try{d=await r.json()}catch(_){}toast(d.detail||('Ошибка '+r.status));return}
+ $('#uf').reset();$('#uPw').placeholder='мин. 8 символов';toast('Сохранено');users();groups()};
+document.querySelectorAll('.tabs.main button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs.main button').forEach(x=>x.classList.toggle('on',x==b));
+ $('#tabDev').hidden=b.dataset.tab!='dev';$('#tabUsr').hidden=b.dataset.tab!='usr';$('#tabGrp').hidden=b.dataset.tab!='grp';$('#tabRole').hidden=b.dataset.tab!='role';if(b.dataset.tab=='role')roleTab();$('#tabAd').hidden=b.dataset.tab!='ad';$('#tabSw').hidden=b.dataset.tab!='sw';if(b.dataset.tab=='sw')swTab();if(b.dataset.tab=='ad')adLoad();if(b.dataset.tab=='grp')grpTab();$('#q').style.visibility=b.dataset.tab=='dev'?'visible':'hidden';if(b.dataset.tab=='usr'){users();tokens()}});
+async function adLoad(){const d=await api('/admin/api/ad');$('#adKind').value=d.kind||'ad';$('#adUrl').value=d.url;$('#adBase').value=d.base_dn;$('#adBind').value=d.bind_user;$('#adPw').value=d.bind_pw;
+ $('#adAdm').value=d.admin_group;$('#adPre').value=d.group_prefix;$('#adOn').checked=d.enabled=='1';$('#adOut').textContent=d.users?('Пользователей из AD в панели: '+d.users):''}
+const adBody=()=>({kind:$('#adKind').value,url:$('#adUrl').value.trim(),base_dn:$('#adBase').value.trim(),bind_user:$('#adBind').value.trim(),bind_pw:$('#adPw').value,admin_group:$('#adAdm').value.trim(),group_prefix:$('#adPre').value,enabled:$('#adOn').checked});
+$('#adf').onsubmit=async e=>{e.preventDefault();const r=await fetch('/admin/api/ad',{method:'POST',headers:H,body:JSON.stringify(adBody())});toast(r.ok?'Сохранено':'Ошибка '+r.status);if(r.ok)adLoad()};
+$('#adTest').onclick=async()=>{$('#adOut').textContent='Проверяю…';const r=await fetch('/admin/api/ad/test',{method:'POST',headers:H,body:JSON.stringify({...adBody(),login:$('#adTL').value.trim(),password:$('#adTP').value})});
+ const d=await r.json().catch(()=>({}));$('#adOut').innerHTML=stepsHtml(r.ok?(d.steps||[]):['✗ '+(d.detail||('Ошибка '+r.status))]);$('#adTP').value=''};
+const vt=v=>((String(v||'').match(/\d+/g))||['0']).slice(0,4).map(Number);
+function vlt(a,b){const x=vt(a),y=vt(b);for(let i=0;i<Math.max(x.length,y.length);i++){const p=x[i]||0,q=y[i]||0;if(p!=q)return p<q}return false}
+function osIcon(o){const s=String(o||'').toLowerCase();
+ if(/windows/.test(s))return '<svg viewBox="0 0 24 24" aria-label="Windows"><path fill="#1e88e5" d="M3 5.5 10.5 4.4v7H3zM11.5 4.3 21 3v8.4h-9.5zM3 12.6h7.5v7L3 18.5zM11.5 12.6H21V21l-9.5-1.3z"/></svg>';
+ if(/mac/.test(s))return '<svg viewBox="0 0 24 24" aria-label="macOS"><path fill="currentColor" d="M16.4 12.6c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.6.9-.8 0-1.9-.9-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.7 2.5 3 2.4 1.2 0 1.6-.8 3.1-.8s1.8.8 3.1.8c1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.6-1-2.6-4zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg>';
+ if(/linux|debian|ubuntu|astra|alt|centos|rocky|alma|fedora|suse|arch|redos|mint/.test(s))return '<span class="lx" aria-label="Linux">🐧</span>';
+ return '<span class="mut">—</span>'}
+// обратный отсчёт до выключения/перезагрузки: команду ПК забирает раз в минуту, затем Windows ждёт 30 с, Linux/macOS — 1 мин
+// задержка: у принятой команды — из ответа ПК («через N с»), иначе — из настроек меню ☰
+const pwrDelay=(x,a)=>{const m=/через (\d+) с/.exec(x.cmd_result||'');if(m&&!x.cmd)return +m[1];const p=ME.power||{},v=p[(a||x.cmd)=='reboot'?'reboot_delay':'shutdown_delay'];return v==null?60:+v};
+const hSec=s=>{s=+s||0;return s<=0?'сразу':s<60?s+' с':Math.floor(s/60)+' мин'+(s%60?' '+s%60+' с':'')};
+function cdChip(lbl,dl,approx,tip){return `<span class="chip w cd" data-dl="${dl}" data-lbl="${lbl}${approx?' ≈':''}" data-done="${lbl==='выключение'?'выключается…':'перезагружается…'}" title="${tip}">${lbl}…</span>`}
+function pwCell(x){if(x.source=='hbbs')return '';const id=esc(x.id);
+ if(x.cmd=='shutdown'||x.cmd=='reboot'){const lbl=x.cmd=='shutdown'?'выключение':'перезагрузка';
+  return `<span class="pw">${cdChip(lbl,(+x.cmd_at||now)+60+pwrDelay(x),true,'Примерно: ПК заберёт команду в течение минуты, затем '+hSec(pwrDelay(x))+' до '+(x.cmd=='shutdown'?'выключения':'перезагрузки'))}<button data-c="updc" data-id="${id}" title="Отменить">✕</button></span>`}
+ const ack=/^(выключается|перезагружается)/.exec(x.cmd_result||'');
+ if(ack&&!x.cmd){const dl=(+x.cmd_at||0)+pwrDelay(x);if(now<dl+60)return `<span class="pw">${cdChip(ack[1]=='выключается'?'выключение':'перезагрузка',dl,false,'ПК принял команду и показал пользователю предупреждение')}</span>`}
+ if(x.online)return `<span class="pw"><button class="off" data-c="pwr" data-a="shutdown" data-id="${id}" title="Выключить">⏻</button><button class="rb" data-c="pwr" data-a="reboot" data-id="${id}" title="Перезагрузить">⟳</button></span>`;
+ if(IPM!='l')return '<span class="mut" title="Включение (Wake-on-LAN) — в режиме «Локальный IP»">—</span>';
+ return x.mac?`<span class="pw"><button class="on" data-c="wake" data-id="${id}" title="Включить (Wake-on-LAN, MAC ${esc(x.mac)}). Только ПК в локальной сети сервера с разрешённым пробуждением по сети">⏻</button></span>`
+  :'<span class="pw"><button disabled title="MAC-адрес неизвестен — выполните на ПК команду обновления данных (Hardware)" style="opacity:.4;cursor:not-allowed">⏻</button></span>'}
+function askPower(x,a){const e=esc,w=a=='shutdown'?'Выключить':'Перезагрузить';
+ $('#hwc').innerHTML=`<h3>${w} ${e(x.hostname||x.id)}?</h3><p class="sub">ID ${e(x.id)}</p>
+ <p class="mut">ПК получит команду в течение минуты и ${a=='shutdown'?'выключится':'перезагрузится'} ${pwrDelay({},a)>0?'через '+hSec(pwrDelay({},a)):'сразу'}; пользователь увидит предупреждение (текст — в меню ☰). Несохранённые данные на ПК будут потеряны.${x.agent_ok?'':'<br><b style="color:var(--warn)">Агент на этом ПК давно не отвечал</b> — выполните на ПК команду обновления данных (окно Hardware) от администратора.'}</p>
+ <div class="row"><button id="pwNo">Отмена</button><button class="${a=='shutdown'?'d':'p'}" id="pwGo" data-id="${e(x.id)}" data-a="${a}">${w}</button></div>`;$('#hwm').classList.add('on')}
+const CAN=k=>ADM||!!(ME&&ME.perms&&ME.perms[k]);const SELOK=()=>ADM||CAN('deploy');
+function swCell(x){if(x.source=='hbbs')return '<span class="mut">—</span>';
+ let h=`<span class="v"><abbr title="RustDesk Client" style="text-decoration:none;cursor:help">RDC</abbr> ${esc(x.version||'?')}</span>`;
+ if(x.cmd=='update')h+=` <span class="chip" title="ПК заберёт задание в течение 5 минут">ждёт обновления</span>`+(CAN('update')?`<button data-c="updc" data-id="${esc(x.id)}" title="Отменить">✕</button>`:'');
+ else if(x.cmd=='running')h+=' <span class="chip w">обновляется…</span>';
+ else if(CAN('update')&&LATEST&&x.version&&vlt(x.version,LATEST))h+=`<button class="upd" data-c="upd" data-id="${esc(x.id)}" title="Доступна версия ${esc(LATEST)}">⬆ ${esc(LATEST)}</button>`;
+ if(CAN('hw'))h+=`<button data-c="sw" data-id="${esc(x.id)}" title="Установленные программы">ПО${x.sw_count?' ('+x.sw_count+')':''}</button>`;
+ if(x.cmd_result&&!/^(выключается|перезагружается)/.test(x.cmd_result))h+=`<div class="r">${esc(x.cmd_result)}${x.cmd_at?' · '+new Date(x.cmd_at*1000).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</div>`;
+ return h}
+async function openSw(id){const d=await api('/admin/api/devices/'+encodeURIComponent(id)+'/software');const e=esc,t=x=>x?new Date(x*1000).toLocaleString('ru-RU'):'';
+ const rows=q=>(d.software||[]).filter(a=>!q||(a.n+' '+a.p).toLowerCase().includes(q)).map(a=>`<tr><td>${e(a.n)}</td><td class="id" style="font-size:12px;font-weight:500">${e(a.v)}</td><td class="mut">${e(a.p||'')}</td><td>${ADM?`<button class="swdel" data-swdel="${e(a.n)}" data-id="${e(d.id)}" title="Удалить программу с этого ПК">Удалить</button>`:''}</td></tr>`).join('');
+ $('#hwc').innerHTML=`<h3>Установленное ПО — ${e(d.hostname||d.id)}</h3><p class="sub">${d.sw_at?(d.software||[]).length+' программ · данные от '+t(d.sw_at):'данных нет — выполните на ПК команду обновления данных (окно Hardware)'}</p>
+ <input type="search" id="swQ" placeholder="Поиск по названию или издателю" style="width:100%">
+ <div class="swl"><table class="hwt"><thead><tr><th>Программа</th><th>Версия</th><th>Издатель</th><th></th></tr></thead><tbody id="swB">${rows('')}</tbody></table></div>`;
+ $('#swQ').oninput=()=>{$('#swB').innerHTML=rows($('#swQ').value.trim().toLowerCase())};$('#hwm').classList.add('on')}
+function askUpd(x){const e=esc;
+ $('#hwc').innerHTML=`<h3>Обновить RustDesk</h3><p class="sub">${e(x.hostname||x.id)} · ID ${e(x.id)}</p>
+ <p>Версия <b>${e(x.version||'?')}</b> → <b>${e(LATEST)}</b>.</p>
+ <p class="mut">ПК заберёт задание в течение 5 минут. На время обновления (1–2 мин) RustDesk на нём перезапустится — открытый сеанс прервётся. Настройки, пароль и регистрация сохраняются.${x.agent_ok?'':'<br><b style="color:var(--warn)">Агент на этом ПК давно не отвечал</b> — на старых установках сначала выполните команду обновления данных (окно Hardware) от администратора.'}</p>
+ <div class="row"><button id="updNo">Отмена</button><button class="p" id="updGo" data-id="${e(x.id)}">Обновить</button></div>`;$('#hwm').classList.add('on')}
+function hwRow(k,v){return `<dt>${k}</dt><dd>${v||'<span class="mut">—</span>'}</dd>`}
+async function openHw(id){const d=await api('/admin/api/devices/'+encodeURIComponent(id)+'/hw');const e=esc,t=x=>x?new Date(x*1000).toLocaleString('ru-RU'):'';
+ const PST={ok:['var(--ok)','Подключён'],offline_mode:['var(--warn)','Автономный режим («Работать автономно»)'],disconnected:['var(--err)','Был подключён, сейчас не подключён']};
+ const pdot=p=>{const v=PST[p.state]||['var(--off)','Статус неизвестен — обновится при следующем сборе данных'];return `<span class="dot" style="background:${v[0]};margin:0 8px 0 0" title="${v[1]}"></span>`};
+ const pr=(d.printers||[]).map(p=>`<tr><td title="${e((PST[p.state]||[,'Статус неизвестен'])[1])}">${pdot(p)}${e(p.name)}${p.default?' <span class="chip">по умолчанию</span>':''}</td><td>${p.type=='usb'?'USB':p.type=='network'?'сеть':'другое'}</td><td class="id" style="font-size:12px">${e(p.ip)||'—'}</td><td class="id" style="font-size:12px">${e(p.mac)||'—'}</td></tr>`).join('');
+ const SST={ok:['var(--ok)','Подключён'],problem:['var(--warn)','Есть, но не работает: отключён в диспетчере устройств или ошибка драйвера'],disconnected:['var(--err)','Был подключён, сейчас не подключён']};
+ const sdot=p=>{const v=SST[p.state]||['var(--off)','Статус неизвестен — обновится при следующем сборе данных'];return `<span class="dot" style="background:${v[0]};margin:0 8px 0 0" title="${v[1]}"></span>`};
+ const sc=(d.scanners||[]).map(p=>`<tr><td title="${e((SST[p.state]||[,'Статус неизвестен'])[1])}">${sdot(p)}${e(p.name)}</td><td>${p.type=='usb'?'USB':p.type=='network'?'сеть':'другое'}</td><td class="id" style="font-size:12px">${e(p.ip)||'—'}</td><td class="id" style="font-size:12px">${e(p.mac)||'—'}</td></tr>`).join('');
+ const LST=['Принтеры','Сканеры','Антивирус'];
+ const hi=(d.history||[]).map(h=>`<tr><td style="white-space:nowrap">${t(h.ts)}</td><td>${e(h.field)}</td><td>${LST.includes(h.field)
+  ?(h.old&&h.old!='—'?`<div style="color:var(--err)">− ${e(h.old)}</div>`:'')+(h.new&&h.new!='—'?`<div style="color:var(--ok)">+ ${e(h.new)}</div>`:'')
+  :`<s class="mut">${e(h.old)}</s><br>${e(h.new)}`}</td></tr>`).join('');
+ $('#hwc').innerHTML=`<h3>Hardware — ${e(d.hostname||d.id)}</h3><p class="sub">ID ${e(d.id)} · ${d.hw_at?'данные от '+t(d.hw_at):(d.from_rustdesk?'только то, что прислал RustDesk — запустите команду ниже':'данных нет')}</p>
+ <dl class="hwg">${hwRow('ОС',e(fmtOS(d.os)))}${d.activation||/windows/i.test(d.os)?hwRow('Активация',d.activation?`<span style="color:${/^Активирована/.test(d.activation)?'var(--ok)':'var(--warn)'}">${e(d.activation)}</span>`:''):''}${d.office?hwRow('MS Office',`<span title="${e(d.office_detail||'')}" style="color:${/· Активирован|Подписка/.test(d.office)&&!/Не активирован|Льготный/.test(d.office)?'var(--ok)':'var(--warn)'}">${e(d.office)}</span>`):''}${hwRow('Антивирус',(d.antivirus||[]).map(a=>`<div>${e(a.name)} — <b style="color:${a.enabled?'var(--ok)':'var(--err)'}">${a.enabled?'вкл':'выкл'}</b>${a.uptodate===false?' <span style="color:var(--warn)">· базы устарели</span>':a.uptodate===true?' <span class="mut">· базы актуальны</span>':''}</div>`).join('')||(d.hw_at?'<span style="color:var(--warn)">не найден</span>':''))}${hwRow('Процессор',e(d.cpu))}${d.board?hwRow('Мат. плата',e(d.board)):''}${hwRow('Видеокарта',e(d.gpu))}${hwRow('Память',e(d.ram))}${hwRow('Системный диск',e(d.disk))}${hwRow('Сеть',e(d.nic))}${d.bt?hwRow('Bluetooth',`<span style="color:${/включён/.test(d.bt)?'var(--ok)':/отключён|ошибка/.test(d.bt)?'var(--warn)':'var(--mut)'}">${e(d.bt)}</span>`):''}
+ ${hwRow('MAC',`<span id="hwMacV" style="display:inline-flex;gap:8px;align-items:center"><span class="id" style="font-size:13px;font-weight:500">${e(d.mac)||'<span class="mut">—</span>'}</span><button id="hwMacE" title="Изменить MAC" style="border:0;background:none;padding:0 2px;cursor:pointer;color:var(--mut);font-size:14px">✏️</button></span>
+ <span id="hwMacF" hidden style="display:none;gap:6px;align-items:center"><input id="hwMac" value="${e(d.mac)}" placeholder="aa:bb:cc:dd:ee:ff" style="font:13px ui-monospace,Consolas,monospace;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:170px"><button id="hwMacS" data-id="${e(d.id)}">Сохранить</button><button id="hwMacC">Отмена</button></span>`)}
+ ${hwRow('Локальный IP',e(d.local_ip))}${hwRow('Внешний IP',e(d.ext_ip))}${hwRow('Пользователи',e(d.users))}${hwRow('Сейчас вошёл',e(d.logged_user))}</dl>
+ <h4>Принтеры</h4>${pr?`<table class="hwt"><thead><tr><th>Принтер</th><th>Подключение</th><th>IP</th><th>MAC</th></tr></thead><tbody>${pr}</tbody></table>`:'<p class="mut">Нет данных или принтеров нет</p>'}
+ <h4>Сканеры</h4>${sc?`<table class="hwt"><thead><tr><th>Сканер</th><th>Подключение</th><th>IP</th><th>MAC</th></tr></thead><tbody>${sc}</tbody></table>`:'<p class="mut">Нет данных или сканеров нет</p>'}
+ <h4>История изменений</h4>${hi?`<table class="hwt"><tbody>${hi}</tbody></table>`:'<p class="mut">Изменений не было</p>'}
+ <h4>Агент на ПК</h4><p style="margin:0 0 8px">${d.agent_bound?'<span class="chip">🔒 привязан своим ключом</span>':d.agent_bind_open?'<span class="chip w">ждёт привязки (окно открыто)</span>':'<span class="chip w">не привязан — работает по общему токену</span>'} ${ADM?'':'<!--'}<button id="hwAkReset" data-id="${e(d.id)}" title="После переустановки системы или замены ПК: следующий запрос агента в течение часа получит новый ключ">Разрешить новую привязку</button>${ADM?'':'-->'}</p>
+ <h4>Обновить данные без переустановки RustDesk</h4><p style="margin:0 0 8px"><button class="p" id="hwRefresh" data-id="${e(d.id)}" title="Агент на ПК соберёт данные заново в течение минуты">⟳ Обновить данные сейчас</button> <span class="mut">— через агента, без команды на ПК (агент уже установлен)</span></p><p class="mut" style="margin:0 0 4px">Выполнить на этом ПК один раз (от администратора) — заодно включится автообновление при загрузке и каждые 12 ч:</p>
+ <div class="cmdl"><span class="mut" style="width:62px">Windows</span><code>${e(d.cmd_win)}</code><button data-cp="${e(d.cmd_win)}">⧉</button></div>
+ <div class="cmdl"><span class="mut" style="width:62px">Linux/Mac</span><code>${e(d.cmd_unix)}</code><button data-cp="${e(d.cmd_unix)}">⧉</button></div>`;
+ $('#hwm').classList.add('on')}
+$('#hwx').onclick=()=>$('#hwm').classList.remove('on');
+$('#hwm').addEventListener('click',async e=>{if((e.target.id=='hwm'&&DOWN==e.target)){$('#hwm').classList.remove('on');return}
+ if(e.target.id=='updNo'||e.target.id=='pwNo'){$('#hwm').classList.remove('on');return}
+ if(e.target.id=='pwGo'){const a=e.target.dataset.a,r=await fetch('/admin/api/devices/'+encodeURIComponent(e.target.dataset.id)+'/power',{method:'POST',headers:H,body:JSON.stringify({action:a})});const d=await r.json().catch(()=>({}));
+  $('#hwm').classList.remove('on');toast(r.ok?((a=='shutdown'?'Выключение':'Перезагрузка')+' — ПК выполнит в течение минуты'+(d.note?'. '+d.note:'')):('Ошибка '+r.status));load();return}
+ if(e.target.id=='updGo'){const r=await fetch('/admin/api/devices/'+encodeURIComponent(e.target.dataset.id)+'/update',{method:'POST',headers:H});const d=await r.json().catch(()=>({}));
+  $('#hwm').classList.remove('on');toast(r.ok?(d.note?'Задание поставлено. '+d.note:'Задание поставлено — ПК обновится в течение 5 минут'):('Ошибка '+r.status));load();return}
+ const c=e.target.closest('button[data-cp]');if(c){copy(c.dataset.cp,'Команда скопирована');return}
+ if(e.target.id=='hwMacE'){$('#hwMacV').style.display='none';const f=$('#hwMacF');f.hidden=false;f.style.display='inline-flex';$('#hwMac').focus();$('#hwMac').select();return}
+ if(e.target.id=='hwMacC'){$('#hwMacF').style.display='none';$('#hwMacV').style.display='inline-flex';return}
+ if(e.target.id=='hwMacS'){const r=await fetch('/admin/api/devices/'+encodeURIComponent(e.target.dataset.id)+'/net',{method:'POST',headers:H,body:JSON.stringify({mac:$('#hwMac').value.trim()})});
+  const d=await r.json().catch(()=>({}));toast(r.ok?'MAC сохранён':(d.detail||'Ошибка '+r.status));if(r.ok){load();openHw(e.target.dataset.id)}}});
+function stepsHtml(a){return (a||[]).map(l=>{const c=/^✓/.test(l)?'var(--ok)':(/^✗/.test(l)||/ЗАПРЕЩ/.test(l))?'var(--err)':/^!/.test(l)?'var(--warn)':'var(--fg)';return `<div style="color:${c}">${esc(l)}</div>`}).join('')}
+let ADS={};
+async function adStatus(fresh){try{ADS=await api('/admin/api/ad/status'+(fresh?'?fresh=1':''))}catch(_){return}const b=$('#adBtn');
+ if(ADS.joined){b.innerHTML=`<span class="d ${ADS.ok===true?'ok':ADS.ok===false?'bad':''}"></span>${esc(ADS.kind_name||'AD')}: ${esc(ADS.domain)}`;b.title=ADS.ok===false?'Контроллер домена не отвечает: '+ADS.error:'Панель в домене '+ADS.domain+' — вход учётками AD'}
+ else{b.textContent='Ввести в домен';b.title='Включить вход в панель и RustDesk учётками домена (Windows AD или FreeIPA)'}}
+function adModal(){const e=esc;
+ if(ADS.joined){$('#admc').innerHTML=`<h3>Домен ${e(ADS.domain)} <span class="chip">${e(ADS.kind_name||'AD')}</span></h3><p class="sub">${ADS.ok===true?'✓ контроллер отвечает':ADS.ok===false?'✗ контроллер не отвечает: '+e(ADS.error):'проверка…'}</p>
+  <dl class="hwg">${hwRow('Контроллер',e(ADS.url))}${hwRow('Учётка панели',e(ADS.bind_user))}${hwRow('Администраторы',e(ADS.admin_group))}${hwRow('Группы',`«${e(ADS.group_prefix)}Имя» → группа «Имя»`)}${hwRow('Пользователей из AD',String(ADS.users))}</dl>
+  <div class="row"><button id="adChk">Проверить</button><button id="adSet">Настройки</button><button class="d" id="adLeave">Вывести из домена</button></div>`}
+ else{$('#admc').innerHTML=`<h3>Ввести в домен</h3><p class="sub">Пользователи домена смогут входить в RustDesk и (администраторы) в эту панель. Пускаются только участники групп с префиксом: в Windows AD «RDS Office» → группа «Office», во FreeIPA «rds-office» → «office».</p>
+  <form class="adf" id="adjf" autocomplete="off">
+  <span class="seg" id="adjK"><button type="button" data-k="ad" class="on">Windows AD</button><button type="button" data-k="freeipa">FreeIPA</button></span>
+  <label>Домен<input type="text" id="adjD" placeholder="corp.example.local" required></label>
+  <label>Контроллер домена (необязательно)<input type="text" id="adjS" placeholder="dc01.corp.example.local или 192.168.0.10 — пусто: найти по имени домена"></label>
+  <label>Учётка домена для поиска пользователей<input type="text" id="adjU" placeholder="svc-rds или svc-rds@corp.example.local"></label>
+  <label>Пароль<input type="password" id="adjP" autocomplete="new-password"></label>
+  <label>Группа администраторов панели<input type="text" id="adjG" value="RDS Admins"></label>
+  <label class="ck" id="adjCl"><input type="checkbox" id="adjC" checked> Создать эту группу в AD, если её нет (нужны права на создание групп)</label>
+  <div class="row"><button type="button" id="adjX">Отмена</button><button class="p" id="adjGo">Ввести в домен</button></div></form>
+  <pre id="adjOut" style="white-space:pre-wrap;margin:10px 0 0"></pre>
+  <p class="mut" style="margin-top:8px">Пароль учётки хранится в базе панели. Лучше отдельная учётка без прав администратора (обычный пользователь домена может искать в каталоге).</p>`}
+ $('#adm').classList.add('on')}
+$('#adBtn').onclick=async()=>{await adStatus(1);adModal()};
+$('#admx').onclick=()=>$('#adm').classList.remove('on');
+$('#adm').addEventListener('click',async ev=>{const t=ev.target;
+ if((t.id=='adm'&&DOWN==t&&!document.getElementById('adjf'))||t.id=='adjX'){$('#adm').classList.remove('on');return}
+ const kb=t.closest('#adjK button');if(kb){document.querySelectorAll('#adjK button').forEach(x=>x.classList.toggle('on',x==kb));const ipa=kb.dataset.k=='freeipa';
+  $('#adjG').value=ipa?'rds-admins':'RDS Admins';$('#adjCl').style.display=ipa?'none':'';$('#adjU').placeholder=ipa?'svc-rds (обычный пользователь FreeIPA)':'svc-rds или svc-rds@corp.example.local';return}
+ if(t.id=='adChk'){await adStatus(1);adModal();toast(ADS.ok?'Контроллер отвечает':'Контроллер не отвечает');return}
+ if(t.id=='adSet'){$('#adm').classList.remove('on');document.querySelector('.tabs.main button[data-tab=ad]').click();return}
+ if(t.id=='adLeave'){if(!confirm('Вывести панель из домена '+ADS.domain+'? Вход учётками AD перестанет работать; локальные учётки продолжат работать.'))return;
+  await api('/admin/api/ad/leave',{method:'POST',headers:H});await adStatus();$('#adm').classList.remove('on');toast('Вход через AD выключен');return}});
+$('#adm').addEventListener('submit',async ev=>{if(ev.target.id!='adjf')return;ev.preventDefault();$('#adjOut').textContent='Подключаюсь…';$('#adjGo').disabled=true;
+ try{const r=await fetch('/admin/api/ad/join',{method:'POST',headers:H,body:JSON.stringify({kind:document.querySelector('#adjK .on')?.dataset.k||'ad',domain:$('#adjD').value.trim(),server:$('#adjS').value.trim(),user:$('#adjU').value.trim(),password:$('#adjP').value,admin_group:$('#adjG').value.trim(),create_groups:$('#adjC').checked})});
+  const d=await r.json().catch(()=>({}));$('#adjOut').innerHTML=stepsHtml(r.ok?d.steps:['✗ '+(d.detail||'Ошибка '+r.status)]);if(r.ok){$('#adjP').value='';await adStatus(1);toast('Панель введена в домен '+ADS.domain)}}
+ finally{$('#adjGo').disabled=false}});
+let GITEMS=[],GM='',GT='u';const GSEL={u:new Map(),d:new Map()};
+async function grpTab(){const g=await api('/admin/api/groups');GITEMS=g.items;await rolesLoad();
+ $('#gb').innerHTML=GITEMS.map(x=>`<tr><td class="id">${esc(x.name)}</td><td>${esc(x.note)||'<span class="mut">—</span>'}</td><td>${roleSel('grole',x.name,x.role,false)}${x.can_connect||x.can_password?'<span class="chip w" title="Старые отдельные галочки">+ отдельные права</span>':''}</td><td>${x.users}</td><td>${x.devices}</td>
+ <td><div class="acts"><button class="p" data-g="mem" data-n="${esc(x.name)}">Состав</button><button data-g="ren" data-n="${esc(x.name)}">Переименовать</button><button data-g="note" data-n="${esc(x.name)}">Заметка</button><button class="d" data-g="del" data-n="${esc(x.name)}">✕</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="mut">Групп пока нет — создайте первую</td></tr>'}
+async function gpost(body){const r=await fetch('/admin/api/groups',{method:'POST',headers:H,body:JSON.stringify(body)});if(!r.ok){let d={};try{d=await r.json()}catch(_){}toast(d.detail||('Ошибка '+r.status));return false}return true}
+$('#gf').onsubmit=async e=>{e.preventDefault();if(await gpost({name:$('#gName').value.trim(),note:$('#gNote').value})){$('#gf').reset();toast('Группа создана');grpTab();groups()}};
+$('#gb').addEventListener('click',async e=>{const b=e.target.closest('button[data-g]');if(!b)return;const n=b.dataset.n,g=GITEMS.find(x=>x.name==n)||{};
+ if(b.dataset.g=='ren'){const v=prompt('Новое название группы «'+n+'»:',n);if(v&&v.trim()&&v.trim()!=n&&await gpost({name:v.trim(),old_name:n,note:g.note})){toast('Переименовано');grpTab();groups()}}
+ if(b.dataset.g=='note'){const v=prompt('Заметка для группы «'+n+'»:',g.note||'');if(v!==null&&await gpost({name:n,note:v})){grpTab()}}
+ if(b.dataset.g=='del'&&confirm('Удалить группу «'+n+'»? Пользователи и компьютеры останутся, но выйдут из группы.')){await api('/admin/api/groups/'+encodeURIComponent(n),{method:'DELETE',headers:H});toast('Удалено');grpTab();groups();load()}
+ if(b.dataset.g=='mem')openGm(n)});
+async function openGm(n){GM=n;await load();const ud=await api('/admin/api/users');USERS=ud.users;GSEL.u.clear();GSEL.d.clear();
+ USERS.forEach(u=>{if((u.groups||[]).includes(n))GSEL.u.set(u.username,true)});all.forEach(x=>{if((x.groups||[]).includes(n))GSEL.d.set(x.id,true)});
+ $('#gmName').textContent=n;$('#gmQ').value='';GT='u';document.querySelectorAll('#gm .tabs button').forEach(x=>x.classList.toggle('on',x.dataset.gt=='u'));renderGm();$('#gm').classList.add('on')}
+function renderGm(){const q=$('#gmQ').value.trim().toLowerCase();let rows;
+ if(GT=='u')rows=USERS.filter(u=>!q||[u.username,u.display_name,u.note].join(' ').toLowerCase().includes(q)).map(u=>`<label><input type="checkbox" value="${esc(u.username)}" ${GSEL.u.get(u.username)?'checked':''}><span class="id">${esc(u.username)}</span><span>${esc(u.display_name||'')}${u.is_admin?' <span class="chip">админ</span>':''}${u.note?` <span class="mut" title="Заметка">📝 ${esc(u.note)}</span>`:''}</span>${(u.groups||[]).filter(g=>g!=GM).length?`<span class="own" style="color:var(--mut)">также в: ${esc((u.groups||[]).filter(g=>g!=GM).join(', '))}</span>`:''}</label>`);
+ else rows=all.filter(x=>x.source!='hbbs').filter(x=>!q||[x.id,x.hostname,x.username,x.note,x.person,x.person_ad].join(' ').toLowerCase().includes(q)).map(x=>{const oth=(x.groups||[]).filter(g=>g!=GM);
+  return `<label><input type="checkbox" value="${esc(x.id)}" ${GSEL.d.get(x.id)?'checked':''}><span class="id">${esc(x.id)}</span><span>${esc(x.hostname)}${x.note?` <span class="mut" title="Заметка">📝 ${esc(x.note)}</span>`:''}</span>${oth.length?`<span class="own" style="color:var(--mut)">также в: ${esc(oth.join(', '))}</span>`:''}</label>`});
+ $('#gmList').innerHTML=rows.join('')||'<div class="mut" style="padding:10px">Ничего не найдено</div>';
+ const cu=[...GSEL.u.values()].filter(Boolean).length,cd=[...GSEL.d.values()].filter(Boolean).length;$('#gmCnt').textContent='Выбрано: пользователей '+cu+', компьютеров '+cd}
+$('#gmList').addEventListener('change',e=>{if(e.target.type=='checkbox'){GSEL[GT].set(e.target.value,e.target.checked);renderGm()}});
+document.querySelectorAll('#gm .tabs button').forEach(b=>b.onclick=()=>{GT=b.dataset.gt;document.querySelectorAll('#gm .tabs button').forEach(x=>x.classList.toggle('on',x==b));renderGm()});
+$('#gmQ').oninput=renderGm;const gmClose=()=>$('#gm').classList.remove('on');$('#gmx').onclick=gmClose;$('#gmCancel').onclick=gmClose;$('#gm').onclick=e=>{if((e.target.id=='gm'&&DOWN==e.target))gmClose()};
+document.addEventListener('keydown',e=>{if(e.key=='Escape')gmClose()});
+$('#gmSave').onclick=async()=>{const users=[...GSEL.u].filter(([k,v])=>v).map(([k])=>k),devices=[...GSEL.d].filter(([k,v])=>v).map(([k])=>k);
+ const r=await api('/admin/api/groups/'+encodeURIComponent(GM)+'/members',{method:'POST',headers:H,body:JSON.stringify({users,devices})});
+ gmClose();toast('Состав сохранён: пользователей '+r.users+', компьютеров '+r.devices);grpTab();load();groups()};
+let UM='';
+const UMSEL=new Map();
+async function openDevs(u){UM=u.username;await load();UMSEL.clear();all.forEach(x=>{if(x.owner==UM)UMSEL.set(x.id,true)});
+ $('#umName').textContent=u.username;$('#umQ').value='';renderUm();$('#um').classList.add('on')}
+function renderUm(){const q=$('#umQ').value.trim().toLowerCase();
+ $('#umList').innerHTML=all.filter(x=>x.source!='hbbs').filter(x=>!q||[x.id,x.hostname,x.username,x.note].join(' ').toLowerCase().includes(q)).map(x=>
+  `<label><input type="checkbox" value="${esc(x.id)}" ${UMSEL.get(x.id)?'checked':''}><span class="id">${esc(x.id)}</span><span>${esc(x.hostname)}</span>${x.owner&&x.owner!=UM?`<span class="own">сейчас у ${esc(x.owner)}</span>`:''}</label>`).join('')||'<div class="mut" style="padding:10px">Нет компьютеров</div>'}
+$('#umList').addEventListener('change',e=>{if(e.target.type=='checkbox')UMSEL.set(e.target.value,e.target.checked)});
+$('#umQ').oninput=renderUm;
+const umClose=()=>$('#um').classList.remove('on');$('#umx').onclick=umClose;$('#umCancel').onclick=umClose;$('#um').onclick=e=>{if((e.target.id=='um'&&DOWN==e.target))umClose()};
+document.addEventListener('keydown',e=>{if(e.key=='Escape')umClose()});
+$('#umSave').onclick=async()=>{const ids=[...UMSEL].filter(([k,v])=>v).map(([k])=>k);
+ const r=await api('/admin/api/users/'+encodeURIComponent(UM)+'/devices',{method:'POST',headers:H,body:JSON.stringify({ids})});
+ umClose();toast('Назначено компьютеров: '+r.count);users();load()};
+const MQ=matchMedia('(max-width:760px)');
+function placeHdr(){const box=MQ.matches?$('#menuMore'):$('#hdrx');['#adBtn','#dlMe','#cl','#meName','#out'].forEach(q=>{const el=$(q);if(el&&el.parentNode!==box)box.appendChild(el)})}
+MQ.addEventListener?MQ.addEventListener('change',placeHdr):MQ.addListener(placeHdr);placeHdr();
+function menuPos(){const r=$('#menuBtn').getBoundingClientRect(),m=$('#menu');m.style.top=(r.bottom+6)+'px';if(!MQ.matches){m.style.right=Math.max(10,innerWidth-r.right)+'px'}}
+$('#menuBtn').onclick=e=>{e.stopPropagation();const m=$('#menu'),on=!m.classList.contains('on');m.classList.toggle('on',on);$('#menuBtn').setAttribute('aria-expanded',on);if(on)menuPos()};
+document.addEventListener('mousedown',e=>{const m=$('#menu');if(m.classList.contains('on')&&!m.contains(e.target)&&e.target.id!='menuBtn'){m.classList.remove('on');$('#menuBtn').setAttribute('aria-expanded','false')}});
+document.addEventListener('keydown',e=>{if(e.key=='Escape'){$('#menu').classList.remove('on');$('#menuBtn').setAttribute('aria-expanded','false')}});
+addEventListener('resize',()=>{if($('#menu').classList.contains('on'))menuPos()});
+
+// ---------------------------------------------------------------- программы
+const PLAT={windows:'Windows',linux:'Linux',mac:'macOS'};var SWOS='windows';try{const v=localStorage.getItem('rds_swos');if(PLAT[v])SWOS=v}catch(e){}
+const KINDS={windows:[['msi','MSI (тихая установка)'],['exe','EXE (свои параметры)'],['winget','winget (ID пакета)'],['ps1','Скрипт PowerShell']],
+ linux:[['pkg','Пакет (apt / dnf / zypper / pacman)'],['script','Скрипт bash']],mac:[['macpkg','PKG'],['script','Скрипт']]};
+const SRCT={msi:'Ссылка на MSI (или загрузите файл ниже)',exe:'Ссылка на EXE (или загрузите файл ниже)',macpkg:'Ссылка на PKG (или загрузите файл ниже)',winget:'ID пакета winget, например 7zip.7zip',pkg:'Пакеты через пробел, например htop curl',ps1:'Текст скрипта PowerShell',script:'Текст скрипта'};
+const ARGP={msi:'к «/qn /norestart», например INSTALLDIR="C:\\\\App"',exe:'например /S, /quiet /norestart, /VERYSILENT',winget:'доп. параметры winget',pkg:'доп. параметры менеджера пакетов',ps1:'',script:'аргументы скрипта',macpkg:''};
+const devPlat=o=>{o=String(o||'').toLowerCase();return /windows/.test(o)?'windows':/^mac|macos/.test(o)?'mac':o?'linux':''};
+let PKGS=[],JOBS=[];
+function pKinds(sel){const pl=$('#pPlat').value;$('#pKind').innerHTML=KINDS[pl].map(([k,t])=>`<option value="${k}">${t}</option>`).join('');if(sel)$('#pKind').value=sel;pForm()}
+function pForm(){const k=$('#pKind').value,file=['msi','exe','macpkg'].includes(k);$('#pSrcT').textContent=SRCT[k]||'Источник';$('#pSrc').rows=['ps1','script'].includes(k)?6:2;
+ $('#pFileL').style.display=file?'':'none';$('#pCfgL').style.display=k=='pkg'?'':'none';$('#pArgs').placeholder=ARGP[k]||'';
+ const uk=$('#pUk').value;$('#pUaT').textContent=uk=='cmd'?'Команда удаления':uk=='script'?'Скрипт удаления':'Доп. параметры удаления';}
+$('#pPlat').onchange=()=>pKinds();$('#pKind').onchange=pForm;$('#pUk').onchange=pForm;
+$('#pClear').onclick=()=>{$('#pf').reset();$('#pId').value='';$('#pFileI').textContent='';$('#pPlat').value=SWOS;pKinds()};
+function upload(id,file){return new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('POST','/admin/api/pkgs/'+id+'/file');x.setRequestHeader('X-RDS','1');
+ x.setRequestHeader('X-Filename',encodeURIComponent(file.name));x.setRequestHeader('Content-Type','application/octet-stream');
+ x.upload.onprogress=e=>{if(e.lengthComputable)$('#pFileI').textContent='загрузка '+Math.round(e.loaded*100/e.total)+'%'};
+ x.onload=()=>x.status<300?res(JSON.parse(x.responseText)):rej(new Error(x.status));x.onerror=()=>rej(new Error('сеть'));x.send(file)})}
+$('#pf').onsubmit=async e=>{e.preventDefault();const body={id:+$('#pId').value||0,name:$('#pName').value.trim(),platform:$('#pPlat').value,kind:$('#pKind').value,source:$('#pSrc').value,
+ install_args:$('#pArgs').value,config:$('#pCfg').value,post_script:$('#pPost').value,uninstall_kind:$('#pUk').value,uninstall_args:$('#pUa').value,detect_name:$('#pDet').value,note:$('#pNote').value};
+ const r=await fetch('/admin/api/pkgs',{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok){toast(d.detail||('Ошибка '+r.status));return}
+ const f=$('#pFile').files[0];if(f){try{const u=await upload(d.id,f);toast('Сохранено, файл '+u.file_name+' загружен')}catch(err){toast('Программа сохранена, но файл не загрузился: '+err.message)}}else toast('Сохранено');
+ $('#pClear').click();swTab()};
+const fsz=n=>n>=1073741824?(n/1073741824).toFixed(1)+' ГБ':n>=1048576?(n/1048576).toFixed(1)+' МБ':Math.round(n/1024)+' КБ';
+async function swTab(){const d=await api('/admin/api/pkgs');PKGS=d.pkgs;if(!$('#swInv').hidden)invLoad();
+ $('#pb').innerHTML=PKGS.filter(p=>p.platform==SWOS).map(p=>{const kn=(KINDS[p.platform]||[]).find(k=>k[0]==p.kind);const src=p.file_name?`📦 ${esc(p.file_name)} <span class="mut">${fsz(p.file_size)}</span>`:(['ps1','script'].includes(p.kind)?'<span class="mut">скрипт</span>':esc((p.source||'').slice(0,80)));
+  return `<tr><td><b>${esc(p.name)}</b>${p.note?`<div class="mut">${esc(p.note)}</div>`:''}</td><td>${PLAT[p.platform]||p.platform}</td><td>${kn?esc(kn[1]):esc(p.kind)}</td><td style="word-break:break-all">${src||'<span class="mut">—</span>'}</td>
+  <td><div class="acts"><button class="p" data-pa="install" data-p="${p.id}">Установить…</button>${['pkg','winget','msi','exe','macpkg'].includes(p.kind)?`<button data-pa="upgrade" data-p="${p.id}">Обновить…</button>`:''}<button class="d" data-pa="uninstall" data-p="${p.id}">Удалить с ПК…</button><button data-pa="edit" data-p="${p.id}">Изменить</button><button class="d" data-pa="del" data-p="${p.id}" title="Убрать из каталога">✕</button></div></td></tr>`}).join('')||'<tr><td colspan="5" class="mut">Для '+PLAT[SWOS]+' в каталоге пока нет программ — добавьте формой выше</td></tr>';
+ jobsLoad()}
+const JST={queued:'в очереди',running:'выполняется…',ok:'готово',error:'ошибка',canceled:'отменено'},JACT={install:'установка',upgrade:'обновление',uninstall:'удаление'};
+async function jobsLoad(){const d=await api('/admin/api/jobs?limit=200');JOBS=d.jobs;const t=x=>x?new Date(x*1000).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+ $('#jb').innerHTML=JOBS.filter(j=>{const x=all.find(y=>y.id==j.device_id);return !x||devPlat(x.os)==SWOS}).map(j=>`<tr><td style="white-space:nowrap">${t(j.created_at)}</td><td>${esc(j.hostname||j.device_id)} <span class="mut">${esc(j.device_id)}</span></td><td>${esc(j.pkg_name)}</td><td>${JACT[j.action]||esc(j.action)}</td>
+ <td><span class="jst ${j.status}">${JST[j.status]||esc(j.status)}</span></td><td class="mut" style="max-width:360px;word-break:break-word">${esc(j.msg||'')}</td><td>${j.status=='queued'?`<button data-jc="${j.id}">Отменить</button>`:''}</td></tr>`).join('')||'<tr><td colspan="7" class="mut">Заданий для этой ОС ещё не было</td></tr>'}
+setInterval(()=>{if(!document.hidden&&!$('#tabSw').hidden)jobsLoad()},5000);
+// вкладка «ПО»: разделы и сводка установленного
+document.querySelectorAll('#swTabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#swTabs button').forEach(x=>x.classList.toggle('on',x==b));
+ $('#swInv').hidden=b.dataset.st!='inv';$('#swCat').hidden=b.dataset.st!='cat';$('#swJobs').hidden=b.dataset.st!='jobs';if(b.dataset.st=='inv')invLoad();if(b.dataset.st=='jobs')jobsLoad()});
+let INV=null,INVQ='',INVP=SWOS,INVOPEN=new Set();
+async function invLoad(){try{INV=await api('/admin/api/software')}catch(e){return}invRender()}
+function invMatch(it){const n=it.n.toLowerCase();return (PKGS||[]).find(p=>{const d=((p.detect_name||p.name)||'').toLowerCase().trim();return p.platform==it.plat&&d&&n.startsWith(d)})}
+function invRender(){if(!INV)return;const q=INVQ.toLowerCase(),nd=INV.no_data||[];
+ $('#invMiss').hidden=!nd.length;
+ if(nd.length)$('#invMiss').innerHTML=`<b>Нет данных о ПО: ${nd.length} ПК</b> (${nd.slice(0,15).map(d=>esc(d.hostname||d.id)).join(', ')}${nd.length>15?' …':''}) — старый агент или данные ещё не собраны. Один раз выполните на таком ПК от администратора: Windows — <code style="user-select:all">${esc(INV.cmd_win)}</code>, Linux / macOS — <code style="user-select:all">${esc(INV.cmd_unix)}</code>`;
+ const items=INV.items.filter(it=>(!INVP||it.plat==INVP)&&(!q||(it.n+' '+(it.p||'')).toLowerCase().includes(q)));
+ $('#invC').textContent=items.length+' программ'+(items.length>400?' — показаны первые 400, уточните поиск':'');
+ $('#invB').innerHTML=items.slice(0,400).map(it=>{const k=it.plat+'|'+it.n,pk=invMatch(it),vs=Object.entries(it.versions).sort((a,b)=>b[1]-a[1]),open=INVOPEN.has(k);
+  const vers=vs.map(([v,c])=>esc(v||'—')+(vs.length>1?' <span class="mut">×'+c+'</span>':'')).join(', ');
+  return `<tr><td><b>${esc(it.n)}</b>${it.p?`<div class="mut">${esc(it.p)}</div>`:''}</td><td>${PLAT[it.plat]||esc(it.plat||'—')}</td><td class="id" style="font-size:12px;font-weight:500">${vers}</td>
+  <td><button data-iv="tog" data-k="${esc(k)}">${it.devices.length} ПК ${open?'▴':'▾'}</button></td>
+  <td><div class="acts">${pk?`<button data-iv="upgrade" data-k="${esc(k)}" title="Обновить из каталога: ${esc(pk.name)}">Обновить…</button>`:''}<button class="d" data-iv="uninstall" data-k="${esc(k)}">Удалить…</button></div></td></tr>`+
+  (open?`<tr><td colspan="5">${it.devices.map(d=>{const x=all.find(y=>y.id==d.id)||{};return `<span style="display:inline-flex;gap:5px;align-items:center;margin:2px 12px 2px 0;font-size:13px"><span class="dot ${x.online?'on':''}"></span>${esc(d.hostname||d.id)} <span class="mut">${esc(d.v||'')}</span></span>`}).join('')}</td></tr>`:'')}).join('')||'<tr><td colspan="5" class="mut">Ничего не найдено</td></tr>'}
+$('#invQ').oninput=()=>{INVQ=$('#invQ').value.trim();invRender()};function swOsMark(){document.querySelectorAll('#swOs button').forEach(x=>x.classList.toggle('on',x.dataset.os==SWOS))}swOsMark();
+document.querySelectorAll('#swOs button').forEach(b=>b.onclick=()=>{SWOS=INVP=b.dataset.os;try{localStorage.setItem('rds_swos',SWOS)}catch(e){}swOsMark();invRender();if(!$('#pId').value){$('#pPlat').value=SWOS;pKinds()}swTab()});
+if(!$('#pId').value){$('#pPlat').value=SWOS;pKinds()}$('#invR').onclick=()=>invLoad();
+$('#invB').addEventListener('click',e=>{const b=e.target.closest('button[data-iv]');if(!b||!INV)return;const it=INV.items.find(x=>x.plat+'|'+x.n==b.dataset.k);if(!it)return;
+ if(b.dataset.iv=='tog'){INVOPEN.has(b.dataset.k)?INVOPEN.delete(b.dataset.k):INVOPEN.add(b.dataset.k);invRender();return}
+ const ids=it.devices.map(d=>d.id);
+ if(b.dataset.iv=='uninstall'){openDeploy({name:it.n,action:'uninstall',byname:true,only:ids});return}
+ if(b.dataset.iv=='upgrade'){const pk=invMatch(it);if(pk)openDeploy({pkg:pk,action:'upgrade',only:ids})}});
+$('#jb').addEventListener('click',async e=>{const b=e.target.closest('button[data-jc]');if(!b)return;if(!confirm('Отменить задание?'))return;
+ const r=await fetch('/admin/api/jobs/'+b.dataset.jc+'/cancel',{method:'POST',headers:H});toast(r.ok?'Отменено':'Уже выполняется или завершено');jobsLoad()});
+$('#pb').addEventListener('click',async e=>{const b=e.target.closest('button[data-pa]');if(!b)return;const p=PKGS.find(x=>x.id==b.dataset.p);if(!p)return;
+ if(b.dataset.pa=='edit'){$('#pId').value=p.id;$('#pName').value=p.name;$('#pPlat').value=p.platform;pKinds(p.kind);$('#pSrc').value=p.source||'';$('#pArgs').value=p.install_args||'';$('#pCfg').value=p.config||'';$('#pPost').value=p.post_script||'';
+  $('#pUk').value=p.uninstall_kind||'';$('#pUa').value=p.uninstall_args||'';$('#pDet').value=p.detect_name||'';$('#pNote').value=p.note||'';$('#pFileI').textContent=p.file_name?'сейчас: '+p.file_name+' — выберите файл, чтобы заменить':'';pForm();$('#pName').focus();return}
+ if(b.dataset.pa=='del'){if(!confirm('Убрать «'+p.name+'» из каталога? Задания в очереди будут отменены; на компьютерах программа останется.'))return;await api('/admin/api/pkgs/'+p.id,{method:'DELETE',headers:H});toast('Удалено из каталога');swTab();return}
+ openDeploy({pkg:p,action:b.dataset.pa})});
+// выбор компьютеров → подтверждение → задания
+let DP=null;
+function openDeploy(o){const plat=o.pkg?o.pkg.platform:null;DP={...o,sel:new Set(o.devices||[]),devs:all.filter(x=>x.source!='hbbs'&&(!plat||devPlat(x.os)==plat)&&(!o.only||o.only.includes(x.id))),q:''};
+ if(o.devices)return dpConfirm();dpPick();$('#dpm').classList.add('on')}
+function dpTitle(){const w={install:'Установить',upgrade:'Обновить',uninstall:'Удалить'}[DP.action];return w+' «'+(DP.pkg?DP.pkg.name:DP.name)+'»'}
+function dpPick(){const q=DP.q.toLowerCase(),gs=[...new Set(DP.devs.flatMap(x=>x.groups||[]))].sort((a,b)=>a.localeCompare(b,'ru'));
+ const list=DP.devs.filter(x=>!q||[x.id,x.hostname,x.note,(x.groups||[]).join(' ')].join(' ').toLowerCase().includes(q));
+ $('#dpc').innerHTML=`<h3>${esc(dpTitle())}</h3><p class="sub">Выберите компьютеры${DP.pkg?' ('+PLAT[DP.pkg.platform]+' — другие ОС не показаны)':''}. Группа — отметить все её компьютеры.</p>
+ ${gs.length?`<div class="gchips">${gs.map(g=>`<button type="button" data-dg="${esc(g)}">${esc(g)}</button>`).join('')}<button type="button" data-dg="*">все</button><button type="button" data-dg="-">снять</button></div>`:''}
+ <input type="search" id="dpQ" placeholder="Поиск" value="${esc(DP.q)}"><div class="dl">${list.map(x=>`<label><input type="checkbox" value="${esc(x.id)}" ${DP.sel.has(x.id)?'checked':''}><span class="dot ${x.online?'on':''}"></span><span class="id">${esc(x.id)}</span><span>${esc(x.hostname)}${x.note?` <span class="mut">📝 ${esc(x.note)}</span>`:''}</span>${(x.groups||[]).length?`<span class="own" style="color:var(--mut)">${esc(x.groups.join(', '))}</span>`:''}</label>`).join('')||'<div class="mut" style="padding:10px">Подходящих компьютеров нет</div>'}</div>
+ <div class="row"><span class="mut" style="margin-right:auto;align-self:center">Выбрано: ${DP.sel.size}</span><button id="dpNo">Отмена</button><button class="p" id="dpNext" ${DP.sel.size?'':'disabled'}>Далее</button></div>`;
+ const qi=$('#dpQ');qi.oninput=()=>{DP.q=qi.value;const pos=qi.selectionStart;dpPick();const n=$('#dpQ');n.focus();n.setSelectionRange(pos,pos)}}
+function dpConfirm(){const ids=[...DP.sel],names=ids.map(i=>{const x=all.find(y=>y.id==i)||{};return `<li>${esc(x.hostname||'—')} <span class="mut">${esc(i)}${x.online?'':' · не в сети — выполнится, когда ПК включится'}</span></li>`});
+ const un=DP.action=='uninstall';
+ $('#dpc').innerHTML=`<h3>${esc(dpTitle())} на ${ids.length} ${ids.length==1?'компьютере':'компьютерах'}?</h3>
+ <p class="sub">${un?'<b style="color:var(--err)">Программа будет удалена.</b> ':''}Агент выполнит задание в течение минуты от имени SYSTEM / root${un?'':'; пользователь может увидеть окна установщика, если программа их показывает'}.</p>
+ ${DP.byname?`<label class="mut" style="display:grid;gap:4px;font-size:13px">Доп. параметры удаления (необязательно; для EXE-деинсталляторов, например /S)<input type="text" id="dpArgs" style="padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"></label>`:''}
+ <ul class="cl">${names.slice(0,40).join('')}${names.length>40?`<li class="mut">… и ещё ${names.length-40}</li>`:''}</ul>
+ <div class="row">${DP.byname?'':'<button id="dpBack">Назад</button>'}<button id="dpNo">Отмена</button><button class="${un?'d':'p'}" id="dpGo">${un?'Удалить':'Подтвердить'}</button></div>`;$('#dpm').classList.add('on')}
+$('#dpc').addEventListener('change',e=>{if(e.target.type=='checkbox'){e.target.checked?DP.sel.add(e.target.value):DP.sel.delete(e.target.value);const c=$('#dpc .row .mut');if(c)c.textContent='Выбрано: '+DP.sel.size;$('#dpNext').disabled=!DP.sel.size}});
+$('#dpc').addEventListener('click',async e=>{const t=e.target;const g=t.closest('[data-dg]');
+ if(g){const v=g.dataset.dg;DP.devs.forEach(x=>{if(v=='*'||(x.groups||[]).includes(v))DP.sel.add(x.id);if(v=='-')DP.sel.delete(x.id)});dpPick();return}
+ if(t.id=='dpNo'){$('#dpm').classList.remove('on');return}if(t.id=='dpNext'){dpConfirm();return}if(t.id=='dpBack'){dpPick();return}
+ if(t.id=='dpGo'){t.disabled=true;const body=DP.pkg?{package_id:DP.pkg.id,action:DP.action,devices:[...DP.sel]}:{action:'uninstall',name:DP.name,args:($('#dpArgs')||{}).value||'',devices:[...DP.sel]};
+  const r=await fetch('/admin/api/jobs',{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));
+  $('#dpm').classList.remove('on');toast(r.ok?('Поставлено заданий: '+d.queued+(d.skipped&&d.skipped.length?' · пропущено (другая ОС): '+d.skipped.length:'')):(d.detail||'Ошибка '+r.status));if(!$('#tabSw').hidden)jobsLoad()}});
+$('#dpx').onclick=()=>$('#dpm').classList.remove('on');$('#dpm').addEventListener('click',e=>{if(e.target.id=='dpm'&&DOWN==e.target)$('#dpm').classList.remove('on')});
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#dpm').classList.remove('on')});
+// «Удалить» в окне «Установленное ПО» и «Обновить данные сейчас» в Hardware
+$('#hwm').addEventListener('click',async e=>{const d=e.target.closest('[data-swdel]');
+ if(d){$('#hwm').classList.remove('on');openDeploy({name:d.dataset.swdel,action:'uninstall',byname:true,devices:[d.dataset.id]});return}
+ if(e.target.id=='hwAkReset'){const id=e.target.dataset.id;if(!confirm('Сбросить ключ агента этого ПК? Агент, который первым обратится к панели в течение часа, получит новый ключ. Делайте это только после переустановки системы на ПК.'))return;
+  const r=await fetch('/admin/api/devices/'+encodeURIComponent(id)+'/agent-reset',{method:'POST',headers:H});const j=await r.json().catch(()=>({}));toast(r.ok?'Привязка сброшена: окно открыто на час':(j.detail||'Ошибка '+r.status));return}
+ if(e.target.id=='hwRefresh'){const id=e.target.dataset.id,x=all.find(y=>y.id==id)||{};if(!confirm('Обновить данные '+(x.hostname||id)+'? Агент соберёт их в течение минуты.'))return;
+  const r=await fetch('/admin/api/devices/'+encodeURIComponent(id)+'/refresh',{method:'POST',headers:H});const j=await r.json().catch(()=>({}));
+  toast(r.ok?(j.agent_ok?'Запрошено — данные обновятся в течение минуты':'Запрошено, но агент давно не отвечал — данные придут, когда он выйдет на связь'):(j.detail||'Ошибка '+r.status))}});
+pKinds();
+async function meLoad(){ME=await api('/admin/api/me');ADM=!!ME.is_admin;if(!ADM||!SRV.rds)SRV=ME.srv||SRV;
+ $('#fmtSw').style.display=ME.perms&&ME.perms.connect?'':'none';$('#meName').textContent='👤 '+(ME.display_name||ME.username)+(ADM?' · администратор':'');$('#dc').checked=!!(ME.perms&&ME.perms.direct)}
+async function pwLoad(){try{const s=await api('/admin/api/settings');$('#pwSd').value=s.pwr_shutdown_delay;$('#pwRd').value=s.pwr_reboot_delay;$('#pwMsg').value=s.pwr_message;$('#pwDef').dataset.m=s.pwr_default_message||'';$('#akStrict').checked=!!s.agent_key_strict;$('#a2fa').checked=!!s.admin_2fa_required;$('#akInfo').textContent=s.agents_unbound?'Не привязано ПК: '+s.agents_unbound:'Все ПК привязаны'}catch(_){}}
+$('#akStrict').onchange=async e=>{const on=e.target.checked;if(on&&!confirm('Включить строгий режим? ПК без своего ключа перестанут получать команды и задания, пока администратор не разрешит им привязку.')){e.target.checked=false;return}
+ try{await api('/admin/api/settings',{method:'POST',headers:H,body:JSON.stringify({agent_key_strict:on})})}catch(_){e.target.checked=!on;toast('Ошибка');return}pwLoad();toast(on?'Строгий режим включён':'Строгий режим выключен')};
+$('#pwDef').onclick=()=>{$('#pwSd').value=60;$('#pwRd').value=60;$('#pwMsg').value=$('#pwDef').dataset.m||''};
+$('#pwSave').onclick=async()=>{const b={pwr_shutdown_delay:Math.round(+$('#pwSd').value),pwr_reboot_delay:Math.round(+$('#pwRd').value),pwr_message:$('#pwMsg').value};
+ const r=await fetch('/admin/api/settings',{method:'POST',headers:H,body:JSON.stringify(b)});const d=await r.json().catch(()=>({}));
+ if(!r.ok){toast(d.detail||'Ошибка '+r.status);return}
+ ME.power={shutdown_delay:d.pwr_shutdown_delay,reboot_delay:d.pwr_reboot_delay};$('#pwMsg').value=d.pwr_message;draw();toast('Сохранено: выключение через '+hSec(d.pwr_shutdown_delay)+', перезагрузка через '+hSec(d.pwr_reboot_delay))};
+$('#dc').onchange=async e=>{const on=e.target.checked;try{await api('/admin/api/settings',{method:'POST',headers:H,body:JSON.stringify({direct_connect:on})})}catch(_){e.target.checked=!on;toast('Ошибка');return}
+ await meLoad();drawHead();draw();toast(on?'Прямое подключение включено':'Прямое подключение и пароли выключены для всех')};
+async function init(){await meLoad();
+ document.querySelectorAll('.adm').forEach(el=>{if(!ADM)el.style.display='none'});
+ drawHead();await load();
+ if(ADM){st();groups();adStatus();pwLoad();setInterval(()=>{if(!document.hidden)adStatus()},60000)}
+ setInterval(()=>{const a=document.activeElement?.className;if(!document.hidden&&a!='note'&&a!='grp')load()},5000)}
+init();
+
+
+// ---------------- двухфакторная защита своего входа (TOTP: Google Authenticator, Яндекс Ключ, Aegis, 1Password…)
+async function srvClock(){try{const t0=Date.now(),d=await api('/api/time'),t1=Date.now(),df=Math.round((d.t*1000-(t0+t1)/2)/1000);
+ return '<p class="mut" style="margin:8px 0 0">Время сервера: '+new Date(d.t*1000).toLocaleTimeString('ru-RU')+(Math.abs(df)>=20?' — <b style="color:var(--err)">расходится с этим устройством на '+Math.abs(df)+' с</b>':' (совпадает с этим устройством)')+'</p>'}catch(_){return''}}
+async function tfaOpen(){const c=$('#tfac');let s;try{s=await api('/admin/api/me/2fa')}catch(e){toast('Ошибка');return}
+ if(s.on){c.innerHTML='<h3>Двухфакторная защита включена</h3><p class="mut">При входе в панель нужен код из приложения. Чтобы выключить, введите текущий код.</p><div class="adf"><label>Код из приложения<input type="text" id="tfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label><button class="d" id="tfaOff" type="button">Выключить 2FA</button></div>'}
+ else c.innerHTML='<h3>Двухфакторная защита</h3><p class="mut">Кроме пароля, при входе понадобится 6-значный код из приложения на телефоне. Даже если пароль украдут, без телефона в панель не войти.</p><button class="p" id="tfaGo" type="button">Включить</button>';
+ c.insertAdjacentHTML('beforeend',await srvClock());$('#tfam').classList.add('on')}
+$('#tfaBtn').onclick=()=>{$('#menu').classList.remove('on');tfaOpen()};
+$('#tfax').onclick=()=>$('#tfam').classList.remove('on');
+$('#tfac').addEventListener('click',async e=>{const c=$('#tfac');
+ if(e.target.id=='tfaGo'){const r=await fetch('/admin/api/me/2fa/setup',{method:'POST',headers:H});const d=await r.json().catch(()=>({}));if(!r.ok){toast(d.detail||'Ошибка '+r.status);return}
+  c.innerHTML='<h3>Включение 2FA</h3><p class="mut">1. Отсканируйте QR-код приложением-аутентификатором (или введите ключ вручную).</p>'+(d.qr_svg?'<div style="background:#fff;display:inline-block;padding:6px;border-radius:8px">'+d.qr_svg+'</div>':'')+
+  '<p style="word-break:break-all"><span class="mut">Ключ:</span> <code>'+esc(d.secret.replace(/(.{4})/g,'$1 ').trim())+'</code></p><p class="mut">2. Введите код, который показало приложение.</p><div class="adf"><label>Код из приложения<input type="text" id="tfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label><button class="p" id="tfaOn" type="button">Подтвердить и включить</button></div>';
+  $('#tfaCode').focus();return}
+ if(e.target.id=='tfaOn'||e.target.id=='tfaOff'){const on=e.target.id=='tfaOn';const r=await fetch('/admin/api/me/2fa/'+(on?'enable':'disable'),{method:'POST',headers:H,body:JSON.stringify({code:$('#tfaCode').value})});const d=await r.json().catch(()=>({}));
+  if(!r.ok){toast(d.detail||'Ошибка '+r.status);return}$('#tfam').classList.remove('on');toast(on?'Двухфакторная защита включена. Другие сессии завершены.':'Двухфакторная защита выключена')}});
+
+$('#a2fa').onchange=async e=>{const on=e.target.checked;const r=await fetch('/admin/api/settings',{method:'POST',headers:H,body:JSON.stringify({admin_2fa_required:on})});const d=await r.json().catch(()=>({}));
+ if(!r.ok){e.target.checked=!on;toast(typeof d.detail=='string'?d.detail:'Ошибка '+r.status);return}toast(on?'Теперь опасные действия доступны только администраторам с 2FA':'Требование 2FA выключено')};
+$('#dlMe').addEventListener('click',async e=>{e.preventDefault();const href=e.currentTarget.href;try{const s=await api('/admin/api/me/elev');if(!s.elevated&&!await window.rdsElevate())return}catch(_){return}location.href=href});
+$('#alogBtn').onclick=async()=>{$('#menu').classList.remove('on');let d;try{d=await api('/admin/api/adminlog')}catch(_){toast('Ошибка');return}
+ $('#alogb').innerHTML=d.events.map(x=>'<tr><td class="mut">'+esc(new Date(x.ts*1000).toLocaleString('ru-RU'))+'</td><td>'+esc(x.username)+'</td><td class="mut">'+esc(x.ip)+'</td><td>'+(x.ok?'':'<b style="color:var(--err)">✗</b> ')+esc(x.action)+'</td><td class="mut">'+esc(x.target)+'</td></tr>').join('')||'<tr><td colspan="5" class="mut">Пусто</td></tr>';
+ $('#alogm').classList.add('on')};
+$('#alogx').onclick=()=>$('#alogm').classList.remove('on');
+
+// ---------------- резервные копии базы: настройки и состояние (копии делает служба на сервере каждые 15 мин по расписанию)
+const fmtSz=b=>b>=1073741824?(b/1073741824).toFixed(1)+' ГБ':b>=1048576?(b/1048576).toFixed(1)+' МБ':Math.max(1,Math.round(b/1024))+' КБ';
+async function bkLoad(){try{const d=await api('/admin/api/backups');$('#bkE').value=d.backup_every_h;$('#bkD').value=d.backup_dir;$('#bkK').value=d.backup_keep_days;$('#bkM').value=d.backup_max_mb;
+ const last=d.files[0],st=d.status;let t='Копий: '+d.count+(d.count?', всего '+fmtSz(d.total):'')+'.';
+ if(last)t+=' Последняя: '+new Date(last.ts*1000).toLocaleString('ru-RU')+' ('+fmtSz(last.size)+').';
+ if(d.real_dir)t+=' Каталог: '+d.real_dir+(d.free!=null?', свободно '+fmtSz(d.free):'')+'.';if(d.warn)t+=' ⚠ '+d.warn+' — копии идут в каталог по умолчанию.';
+ if(st&&!st.ok)t+=' ⚠ Последний запуск с ошибкой: '+(st.error||'')+'.';if(d.pending)t+=' Ждёт выполнения копия вне расписания (до 15 мин).';$('#bkInfo').textContent=t}catch(_){}}
+$('#bkSave').onclick=async()=>{const b={backup_dir:$('#bkD').value.trim(),backup_every_h:Math.round(+$('#bkE').value),backup_keep_days:Math.round(+$('#bkK').value),backup_max_mb:Math.round(+$('#bkM').value)};
+ const r=await fetch('/admin/api/settings',{method:'POST',headers:H,body:JSON.stringify(b)});const d=await r.json().catch(()=>({}));if(!r.ok){toast(typeof d.detail=='string'?d.detail:'Ошибка '+r.status);return}
+ toast('Сохранено: '+d.backup_dir+', копия раз в '+d.backup_every_h+' ч, хранить '+d.backup_keep_days+' дн., не больше '+d.backup_max_mb+' МБ');bkLoad()};
+$('#bkNow').onclick=async()=>{const r=await fetch('/admin/api/backups/now',{method:'POST',headers:H});toast(r.ok?'Копия будет сделана в течение 15 минут':'Ошибка '+r.status);bkLoad()};
+if(typeof ADM!=='undefined')setTimeout(()=>{if(ADM)bkLoad()},1500);
+$('#menuBtn').addEventListener('click',()=>{if(ADM)bkLoad()});
+
+// ---------------- шаблоны прав (роли)
+let ROLES=[],PKEYS={};
+async function rolesLoad(){try{const d=await api('/admin/api/roles');ROLES=d.roles;PKEYS=d.perm_keys}catch(_){}}
+const roleTitle=n=>(ROLES.find(r=>r.name==n)||{}).title||n;
+function roleOpts(cur,withAdmin){return '<option value="">— без шаблона —</option>'+ROLES.filter(r=>withAdmin||r.name!='admin').map(r=>`<option value="${esc(r.name)}" ${r.name==cur?'selected':''}>${esc(r.title)}</option>`).join('')}
+function roleSel(kind,key,cur,withAdmin){return `<select class="rsel" data-k="${kind}" data-n="${esc(key)}">${roleOpts(cur,withAdmin)}</select>`}
+async function roleTab(){await rolesLoad();const K=Object.keys(PKEYS);
+ $('#roleHd').innerHTML='<th>Шаблон</th>'+K.map(k=>`<th style="font-size:11px" title="${esc(PKEYS[k])}">${esc(PKEYS[k])}</th>`).join('')+'<th>Где назначен</th><th></th>';
+ $('#roleB').innerHTML=ROLES.map(r=>{const adm=r.name=='admin';return `<tr data-r="${esc(r.name)}"><td><input type="text" class="rtitle" value="${esc(r.title)}" ${adm?'disabled':''} style="width:100%;min-width:130px">${r.builtin?' <span class="chip">встроенный</span>':''}</td>`+
+  K.map(k=>`<td style="text-align:center"><input type="checkbox" class="rp" value="${k}" ${adm||r.perms.includes(k)||r.perms.includes('*')?'checked':''} ${adm?'disabled':''}></td>`).join('')+
+  `<td class="mut">польз.: ${r.users}, групп: ${r.groups}, AD: ${r.ad_maps}</td><td><div class="acts">${adm?'<span class="mut">все права</span>':`<button class="p" data-ra="save">Сохранить</button>`}${r.builtin?'':`<button class="d" data-ra="del">✕</button>`}</div></td></tr>`}).join('')}
+$('#roleB').addEventListener('click',async e=>{const b=e.target.closest('button[data-ra]');if(!b)return;const tr=b.closest('tr'),n=tr.dataset.r;
+ if(b.dataset.ra=='save'){const body={name:n,title:tr.querySelector('.rtitle').value.trim(),perms:[...tr.querySelectorAll('.rp:checked')].map(x=>x.value)};
+  const r=await fetch('/admin/api/roles',{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));toast(r.ok?'Шаблон сохранён':(typeof d.detail=='string'?d.detail:'Ошибка '+r.status));roleTab()}
+ if(b.dataset.ra=='del'&&confirm('Удалить шаблон «'+roleTitle(n)+'»? У пользователей, групп и сопоставлений AD он будет снят.')){const r=await fetch('/admin/api/roles/'+encodeURIComponent(n),{method:'DELETE',headers:H});toast(r.ok?'Удалён':'Ошибка '+r.status);roleTab()}});
+$('#roleNew').onclick=async()=>{const t=prompt('Название нового шаблона (права отметите в таблице):');if(!t||!t.trim())return;
+ const r=await fetch('/admin/api/roles',{method:'POST',headers:H,body:JSON.stringify({title:t.trim(),perms:['hw']})});const d=await r.json().catch(()=>({}));toast(r.ok?'Шаблон создан — отметьте права и нажмите «Сохранить»':(typeof d.detail=='string'?d.detail:'Ошибка '+r.status));roleTab()};
+// назначение шаблона пользователю / группе (выпадающий список в строке)
+document.addEventListener('change',async e=>{const s=e.target.closest('select.rsel');if(!s)return;const n=s.dataset.n,role=s.value;
+ const url=s.dataset.k=='urole'?'/admin/api/users/role':'/admin/api/groups/'+encodeURIComponent(n)+'/role';const body=s.dataset.k=='urole'?{users:[n],role}:{role};
+ const r=await fetch(url,{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));toast(r.ok?'Шаблон назначен':(typeof d.detail=='string'?d.detail:'Ошибка '+r.status));
+ if(s.dataset.k=='urole')users();else grpTab()});
+// массовое назначение пользователям
+function ubSel(){const n=document.querySelectorAll('#ub .usel:checked').length;$('#ubN').textContent=n?'Выбрано: '+n:'Отметьте пользователей, чтобы назначить шаблон сразу нескольким';$('#ubRole').innerHTML=roleOpts('',true)}
+$('#ub').addEventListener('change',e=>{if(e.target.classList.contains('usel'))ubSel()});
+$('#ubAll').onchange=e=>{document.querySelectorAll('#ub .usel').forEach(x=>x.checked=e.target.checked);ubSel()};
+$('#ubApply').onclick=async()=>{const us=[...document.querySelectorAll('#ub .usel:checked')].map(x=>x.value);if(!us.length){toast('Никто не выбран');return}
+ const role=$('#ubRole').value;if(!confirm('Назначить шаблон «'+(role?roleTitle(role):'без шаблона')+'» пользователям: '+us.length+'?'))return;
+ const r=await fetch('/admin/api/users/role',{method:'POST',headers:H,body:JSON.stringify({users:us,role})});const d=await r.json().catch(()=>({}));toast(r.ok?'Назначено: '+d.n:(typeof d.detail=='string'?d.detail:'Ошибка '+r.status));$('#ubAll').checked=false;users()};
+setTimeout(()=>{if(typeof ADM!=='undefined'&&ADM)rolesLoad().then(ubSel)},1200);
+// AD: сопоставления и очередь одобрения
+async function amLoad(){await rolesLoad();let d;try{d=await api('/admin/api/ad/maps')}catch(_){return}
+ $('#amRole').innerHTML=roleOpts('',true);$('#adAppr').checked=!!d.approval;
+ $('#amB').innerHTML=d.maps.map(m=>`<tr><td class="id">${esc(m.ad_group)}</td><td>${m.panel_groups.map(g=>`<span class="chip">${esc(g)}</span>`).join('')||'<span class="mut">—</span>'}</td><td>${m.role?esc(roleTitle(m.role)):'<span class="mut">—</span>'}</td><td><div class="acts"><button data-am="edit" data-i="${m.id}">Изменить</button><button class="d" data-am="del" data-i="${m.id}">✕</button></div></td></tr>`).join('')||'<tr><td colspan="4" class="mut">Сопоставлений нет</td></tr>';
+ AMAPS=d.maps;$('#apN').textContent=d.pending.length?'('+d.pending.length+')':'';
+ $('#apB').innerHTML=d.pending.map(p=>`<tr data-u="${esc(p.username)}"><td class="id">${esc(p.username)}</td><td>${esc(p.display_name||'')}</td><td>${p.ad_groups.map(g=>`<span class="chip">${esc(g)}</span>`).join('')||'<span class="mut">—</span>'}</td><td class="mut">${new Date(p.ts*1000).toLocaleString('ru-RU')}${p.attempts>1?' ('+p.attempts+' попыт.)':''}</td><td><select class="apRole">${roleOpts('operator',true)}</select></td><td><input type="text" class="apGrp" placeholder="Офис, Склад" style="min-width:140px"></td><td><div class="acts"><button class="p" data-ap="approve">Разрешить</button><button class="d" data-ap="reject">Отклонить</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="mut">Никто не ждёт</td></tr>'}
+let AMAPS=[];
+$('#amf').onsubmit=async e=>{e.preventDefault();const body={id:+$('#amId').value||undefined,ad_group:$('#amAd').value.trim(),panel_groups:$('#amPg').value.split(',').map(s=>s.trim()).filter(Boolean),role:$('#amRole').value};
+ const r=await fetch('/admin/api/ad/maps',{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok){toast(typeof d.detail=='string'?d.detail:'Ошибка '+r.status);return}
+ $('#amf').reset();$('#amId').value='';toast('Сопоставление сохранено');amLoad();groups()};
+$('#amB').addEventListener('click',async e=>{const b=e.target.closest('button[data-am]');if(!b)return;const m=AMAPS.find(x=>x.id==b.dataset.i);if(!m)return;
+ if(b.dataset.am=='edit'){$('#amId').value=m.id;$('#amAd').value=m.ad_group;$('#amPg').value=m.panel_groups.join(', ');$('#amRole').value=m.role;$('#amAd').focus()}
+ if(b.dataset.am=='del'&&confirm('Удалить сопоставление «'+m.ad_group+'»? Его участники потеряют эти права при следующем входе.')){const r=await fetch('/admin/api/ad/maps/'+m.id,{method:'DELETE',headers:H});toast(r.ok?'Удалено':'Ошибка '+r.status);amLoad()}});
+$('#apB').addEventListener('click',async e=>{const b=e.target.closest('button[data-ap]');if(!b)return;const tr=b.closest('tr'),u=tr.dataset.u;
+ const body=b.dataset.ap=='reject'?{action:'reject'}:{action:'approve',role:tr.querySelector('.apRole').value,groups:tr.querySelector('.apGrp').value.split(',').map(s=>s.trim()).filter(Boolean)};
+ if(b.dataset.ap=='reject'&&!confirm('Отклонить '+u+'? При следующей попытке входа он снова появится в очереди.'))return;
+ const r=await fetch('/admin/api/ad/pending/'+encodeURIComponent(u),{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));toast(r.ok?(b.dataset.ap=='reject'?'Отклонён':'Доступ разрешён'):(typeof d.detail=='string'?d.detail:'Ошибка '+r.status));amLoad();users()});
+$('#adAppr').onchange=async e=>{const on=e.target.checked;const r=await fetch('/admin/api/settings',{method:'POST',headers:H,body:JSON.stringify({ad_approval:on})});if(!r.ok){e.target.checked=!on;toast('Ошибка '+r.status);return}toast(on?'Вход по одобрению включён':'Вход по одобрению выключен')};
+document.querySelector('.tabs.main button[data-tab=ad]').addEventListener('click',()=>amLoad());
+// техник: массовая установка ПО на выбранные ПК (только из каталога)
+$('#bulkSw').onclick=async()=>{const ids=[...SEL];if(!ids.length)return;let d;try{d=await api('/admin/api/pkgs')}catch(_){toast('Нет доступа к каталогу ПО');return}
+ const ps=d.pkgs||[];if(!ps.length){toast('Каталог ПО пуст');return}
+ $('#dpc').innerHTML=`<h3>ПО для выбранных компьютеров (${ids.length})</h3><p class="sub">Программа из каталога и действие. Компьютеры с другой ОС будут пропущены.</p><div class="adf"><label>Программа<select id="bsP">${ps.map(p=>`<option value="${p.id}">${esc(p.name)} — ${esc(PLAT[p.platform]||p.platform)}</option>`).join('')}</select></label><label>Действие<select id="bsA"><option value="install">Установить</option><option value="upgrade">Обновить</option><option value="uninstall">Удалить</option></select></label><button class="p" id="bsGo" type="button">Далее</button></div>`;
+ $('#dpm').classList.add('on');$('#bsGo').onclick=()=>{const p=ps.find(x=>x.id==$('#bsP').value);openDeploy({pkg:p,action:$('#bsA').value,devices:ids})}};
+
+// ---------------- шифрование копий и внешние хранилища rds-vault
+async function vlOpen(){$('#menu').classList.remove('on');let d;try{d=await api('/admin/api/vaults')}catch(_){toast('Ошибка');return}const e=esc,t=x=>x?new Date(x*1000).toLocaleString('ru-RU'):'—';
+ const rows=d.vaults.map(v=>{const s=v.status||{};const st=!s.checked?'<span class="mut">ещё не проверялось</span>':s.ok?`<span style="color:var(--ok)">● в сети</span> · копий ${s.count}, ${fmtSz(s.total||0)}, свободно ${fmtSz(s.free||0)} · последняя отправка ${t(s.last_ts)}`:`<span style="color:var(--err)">● ошибка</span>: ${e(s.error||'')}`;
+  return `<tr><td>${e(v.name)}</td><td class="id" style="font-size:13px">${e(v.host)}:${v.port}</td><td style="font-size:13px">${st}</td><td><button class="d" data-vd="${v.id}">✕</button></td></tr>`}).join('')||'<tr><td colspan="4" class="mut">Хранилищ нет</td></tr>';
+ $('#vlc').innerHTML=`<h3>Шифрование и внешние хранилища копий</h3>
+ <h4>1. Шифрование</h4><p class="mut">${d.encrypted?'✅ Копии шифруются (age). Открытый ключ: <code style="font-size:11px;word-break:break-all">'+e(d.age_recipient)+'</code>':'⚠ Копии пока не шифруются, во внешние хранилища они не отправляются.'}</p>
+ <p><button id="vlKey" ${d.encrypted?'':'class="p"'}>${d.encrypted?'Заменить ключ…':'Создать ключ шифрования'}</button></p><div id="vlKeyOut"></div>
+ <h4>2. Хранилища</h4><p class="mut">Сервер RDS после каждой копии отправляет её (уже зашифрованной) во все хранилища по взаимному TLS. Хранилище умеет только принять файл и показать список — удалить копии по сети нельзя, старые оно чистит само.</p>
+ <div class="tw"><table class="hwt"><thead><tr><th>Имя</th><th>Адрес</th><th>Состояние</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+ <div class="adf" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));display:grid;gap:8px;margin-top:10px"><label>Имя<input type="text" id="vlN" placeholder="Сервер копий, диск 1 ТБ"></label><label>Адрес (IP или имя)<input type="text" id="vlH" placeholder="192.168.1.20"></label><label>Порт<input type="number" id="vlP" value="8743"></label><label>Каталог на той машине<input type="text" id="vlD" placeholder="/mnt/disk/rds-vault"></label><button class="p" id="vlAdd" type="button">Добавить</button></div><div id="vlOut"></div>`;
+ $('#vlm').classList.add('on')}
+$('#bkVault').onclick=vlOpen;$('#vlx').onclick=()=>$('#vlm').classList.remove('on');
+$('#vlc').addEventListener('click',async e=>{const b=e.target;
+ if(b.id=='vlKey'){if(b.textContent.startsWith('Заменить')&&!confirm('Заменить ключ? Новые копии будут шифроваться новым ключом; для старых копий нужен СТАРЫЙ закрытый ключ — не выбрасывайте его.'))return;
+  const r=await fetch('/admin/api/backup-key',{method:'POST',headers:H});const d=await r.json().catch(()=>({}));if(!r.ok){toast(typeof d.detail=='string'?d.detail:'Ошибка '+r.status);return}
+  const blob=URL.createObjectURL(new Blob(['# Закрытый ключ копий RDS ('+location.host+', '+new Date().toLocaleString('ru-RU')+')\n# Открытый: '+d.recipient+'\n'+d.secret+'\n'],{type:'text/plain'}));
+  $('#vlKeyOut').innerHTML=`<div style="border:2px solid var(--warn);border-radius:10px;padding:10px;margin:6px 0"><b>Закрытый ключ показан ОДИН раз — сохраните его сейчас</b> (флешка, менеджер паролей). Без него копию не расшифровать; на сервере он не хранится.<pre style="white-space:pre-wrap;word-break:break-all;font-size:12px;margin:6px 0">${esc(d.secret)}</pre><a class="b p" href="${blob}" download="rds-backup-key.txt">⬇ Скачать файл ключа</a></div>`;toast('Ключ создан');return}
+ if(b.id=='vlAdd'){const body={name:$('#vlN').value.trim(),host:$('#vlH').value.trim(),port:+$('#vlP').value,dir:$('#vlD').value.trim()||undefined};
+  const r=await fetch('/admin/api/vaults',{method:'POST',headers:H,body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok){toast(typeof d.detail=='string'?d.detail:'Ошибка '+r.status);return}
+  $('#vlOut').innerHTML=`<div style="border:2px solid var(--warn);border-radius:10px;padding:10px;margin:8px 0"><b>Выполните на машине хранилища</b> (команда показана один раз: в ней закрытый ключ хранилища):<div class="cmdl"><code id="vlCmd">${esc(d.install)}</code><button type="button" id="vlCp">Копировать</button></div><p class="mut">${esc(d.note)}</p></div>`;
+  $('#vlCp').onclick=()=>copy(d.install,'Команда скопирована');return}
+ if(b.dataset.vd&&confirm('Убрать хранилище из рассылки? Уже отправленные копии в нём останутся.')){const r=await fetch('/admin/api/vaults/'+b.dataset.vd,{method:'DELETE',headers:H});toast(r.ok?'Убрано':'Ошибка '+r.status);vlOpen()}});
+</script></body></html>

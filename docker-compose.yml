@@ -1,0 +1,80 @@
+# RDS — свой сервер RustDesk с панелью управления.
+# Ставить в /opt/RDS (пути /opt/RDS зашиты в скрипты копий). Настройки — в .env (см. .env.example, install.sh).
+#   hbbs  — ID-сервер: 21115/tcp, 21116/tcp+udp, 21118/tcp
+#   hbbr  — ретранслятор: 21117/tcp, 21119/tcp (только для клиентов с ключом сервера)
+#   panel — 127.0.0.1:21114, наружу — через обратный прокси с HTTPS (deploy/Caddyfile.example)
+#   postgres / redis — только 127.0.0.1
+# Всё состояние — в ./data (ключи сервера, база, файлы панели).
+name: rds
+
+x-hbb: &hbb
+  image: ${HBBS_IMAGE:-scposs/rds-hbbs-kx:1.1.16-kx1}
+  volumes:
+    - ./data:/root
+  network_mode: host
+  restart: unless-stopped
+
+services:
+  hbbs:
+    <<: *hbb
+    container_name: hbbs
+    command: hbbs -r ${RDS_HOST:?задайте RDS_HOST в .env}:21117
+    environment:
+      - ALWAYS_USE_RELAY=${ALWAYS_USE_RELAY:-N}
+    depends_on: [hbbr]
+
+  hbbr:
+    <<: *hbb
+    container_name: hbbr
+    # -k _ : ретранслятор только для клиентов с ключом сервера (data/id_ed25519)
+    command: hbbr -k _
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: rds-postgres
+    environment:
+      - POSTGRES_DB=rds
+      - POSTGRES_USER=rds
+      - POSTGRES_PASSWORD=${PG_PASSWORD:?задайте PG_PASSWORD в .env}
+    command: postgres -c listen_addresses=127.0.0.1 -c port=5433
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    network_mode: host
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-p", "5433", "-U", "rds", "-d", "rds"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: rds-redis
+    command: redis-server --bind 127.0.0.1 --port 6380 --requirepass ${REDIS_PASSWORD:?задайте REDIS_PASSWORD в .env} --appendonly yes --save 300 10
+    volumes:
+      - ./data/redis:/data
+    network_mode: host
+    restart: unless-stopped
+
+  panel:
+    image: ${PANEL_IMAGE:-scposs/rds-panel:1.0.0}
+    container_name: rds-panel
+    environment:
+      - RDS_HOST=${RDS_HOST}
+      - ADMIN_HOST=${ADMIN_HOST:?задайте ADMIN_HOST в .env}
+      - CLIENT_HOST=${CLIENT_HOST:?задайте CLIENT_HOST в .env}
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - SECRET_KEY=${SECRET_KEY:-}
+      - REG_TOKEN=${REG_TOKEN:?задайте REG_TOKEN в .env}
+      - PROXY_URL=${PROXY_URL:-}
+      - CLIENT_SPECIAL_IDS=${CLIENT_SPECIAL_IDS:-0}
+      - PG_DSN=postgresql://rds:${PG_PASSWORD}@127.0.0.1:5433/rds
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@127.0.0.1:6380/0
+    volumes:
+      - ./data:/data
+    network_mode: host
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_started}
+    restart: unless-stopped

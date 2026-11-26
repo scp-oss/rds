@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="alternate icon" href="/favicon.ico"><title>Политика конфиденциальности — удалённая помощь</title>
+<style>
+  :root {
+    --bg: #f3f7fd; --bg-2: #e6eefc; --text: #0a1224; --text-dim: #5c6c86; --text-faint: #93a1ba;
+    --accent-1: #2563eb; --accent-2: #3b82f6; --accent-3: #60a5fa; --accent-soft: rgba(37, 99, 235, 0.09);
+    --hairline: rgba(15, 24, 45, 0.10); --surface: rgba(255, 255, 255, 0.6);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #050810; --bg-2: #0a0f1e; --text: #eef2fc; --text-dim: #8b98b8; --text-faint: #576280;
+      --accent-1: #3b82f6; --accent-2: #5b9bff; --accent-3: #8ebbff; --accent-soft: rgba(59, 130, 246, 0.16);
+      --hairline: rgba(180, 200, 255, 0.12); --surface: rgba(255, 255, 255, 0.045);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1100px 700px at 50% -10%, var(--bg-2), transparent 60%), var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 16px 64px;
+  }
+  main { max-width: 680px; margin: 0 auto; }
+  .back { display: inline-block; font-size: 13px; color: var(--text-dim); text-decoration: none; margin-bottom: 28px; }
+  .back:hover { color: var(--accent-2); }
+  h1 {
+    font-size: clamp(28px, 6vw, 38px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2;
+    background: linear-gradient(135deg, var(--text) 20%, var(--accent-1) 130%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .date { font-size: 13px; color: var(--text-faint); margin-bottom: 32px; }
+  h2 { font-size: 17px; font-weight: 700; margin: 30px 0 10px; letter-spacing: -0.01em; }
+  p, li { font-size: 15px; line-height: 1.65; color: var(--text-dim); }
+  p + p { margin-top: 10px; }
+  b, strong { color: var(--text); font-weight: 600; }
+  ul { padding-left: 20px; margin-top: 6px; }
+  li + li { margin-top: 4px; }
+  .note {
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px;
+    padding: 16px 18px; margin-top: 12px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .note p { font-size: 14px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .links a {
+    font-size: 14px; font-weight: 600; color: var(--accent-2); text-decoration: none;
+    background: var(--accent-soft); padding: 9px 14px; border-radius: 100px;
+  }
+  .links a:hover { filter: brightness(1.1); }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px;
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 6px; color: var(--text); word-break: break-all;
+  }
+  .foot { margin-top: 44px; font-size: 12px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="/">← К загрузке</a>
+  <h1>Политика конфиденциальности</h1>
+  <div class="date">Удалённая помощь через RustDesk · редакция от 17.11.2026</div>
+
+  <p>Эта страница объясняет, что происходит при установке RustDesk с этого сайта, какие данные получает наш сервер и как от всего этого отказаться.</p>
+
+  <h2>Что делает установщик</h2>
+  <ul>
+    <li>Скачивает <b>официальный RustDesk</b> (открытая программа удалённого доступа) с GitHub, а если GitHub недоступен — с нашего сервера. В Windows подпись программы проверяется перед установкой.</li>
+    <li>Настраивает RustDesk на наш сервер <code>{{RDS}}</code>, чтобы соединения шли через него, а не через общие серверы RustDesk.</li>
+    <li><b>Включает постоянный доступ.</b> Для вашего компьютера создаётся отдельный случайный пароль, он сохраняется в RustDesk как постоянный. Благодаря ему специалист может подключиться, даже когда вас нет рядом, — например, чтобы закончить настройку или помочь ночью.</li>
+    <li>Обычный одноразовый пароль RustDesk тоже продолжает работать.</li>
+  </ul>
+
+  <h2>Какие данные получает сервер</h2>
+  <ul>
+    <li>ID RustDesk, имя компьютера, имя пользователя, операционная система и версия RustDesk;</li>
+    <li>постоянный пароль вашего компьютера (только при постоянном доступе);</li>
+    <li>IP-адрес и время установки, а затем — отметки «компьютер в сети» и общие сведения о системе (процессор, объём памяти), которые RustDesk сам отправляет на сервер.</li>
+  </ul>
+  <p>Сервер <b>не получает и не записывает</b> содержимое экрана, файлы, переписку и нажатия клавиш. Сеансы шифруются между вашим компьютером и компьютером специалиста; сервер только помогает им найти друг друга и при необходимости пересылает зашифрованный поток.</p>
+
+  <h2>Кто видит эти данные</h2>
+  <p>Данные хранятся на нашем сервере. Доступ к ним есть только у администратора через панель, защищённую паролем. Мы не передаём их третьим лицам и не используем ни для чего, кроме удалённой помощи.</p>
+
+  <h2>Как проходит подключение</h2>
+  <p>Пока специалист подключён, RustDesk показывает на вашем экране окно сеанса. Разорвать соединение можно в любой момент кнопкой в этом окне.</p>
+
+  <h2>Если постоянный доступ вам не нужен</h2>
+  <p>Установите вариант <b>только с одноразовым паролем</b>: специалист сможет подключиться, только когда вы сами сообщите ему пароль из окна RustDesk, а он меняется после каждого сеанса.</p>
+  <div class="links">
+    <a href="/download/windows?master=0">Windows (.exe)</a>
+    <a href="/download/mac?master=0">macOS (.pkg)</a>
+    <a href="/download/deb?master=0">Linux (.deb)</a>
+  </div>
+  <div class="note">
+    <p>Через терминал:<br>
+      macOS — <code>curl -fsSL {{BASE}}/mac.sh?master=0 | sudo bash</code><br>
+      Linux — <code>curl -fsSL {{BASE}}/linux.sh?master=0 | sudo sh</code></p>
+  </div>
+  <p style="margin-top:14px">Если RustDesk уже установлен с постоянным доступом, его можно отключить самостоятельно: RustDesk → <b>Настройки</b> → <b>Безопасность</b> → <b>Пароль</b> → «Использовать только одноразовый пароль».</p>
+
+  <h2>Как удалить данные</h2>
+  <ul>
+    <li>Удалите RustDesk с компьютера — постоянный пароль перестанет действовать.</li>
+    <li>Попросите специалиста, который дал вам ссылку, удалить ваш компьютер из панели: запись и пароль будут стёрты.</li>
+  </ul>
+
+  <h2 id="cookie">Cookie</h2>
+  <p>Страницы загрузки <b>не используют рекламные, аналитические и отслеживающие cookie</b> и сами cookie не ставят.</p>
+  <ul>
+    <li><b>Cloudflare</b> может сохранить технический cookie (например, <code>__cf_bm</code>), если заподозрит автоматический трафик. Он нужен только для защиты от ботов и живёт около 30 минут.</li>
+    <li>Ваш ответ на уведомление о cookie хранится в браузере (<code>localStorage</code>), чтобы оно не показывалось снова. На сервер он не отправляется. Удалить его можно, очистив данные сайта в браузере.</li>
+  </ul>
+
+  <h2>Сторонние сервисы</h2>
+  <ul>
+    <li><b>GitHub</b> — оттуда скачивается сам RustDesk;</li>
+    <li><b>Cloudflare</b> — через него открывается эта страница;</li>
+    <li><b>ipify.org</b> — к нему страница загрузки может обратиться, чтобы показать ваш IP-адрес.</li>
+  </ul>
+
+  <div class="foot">По вопросам обращайтесь к специалисту, который прислал вам эту ссылку.</div>
+</main>
+</body>
+</html>

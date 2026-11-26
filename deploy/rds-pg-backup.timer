@@ -1,0 +1,8 @@
+[Unit]
+Description=RDS: копии базы панели — проверка расписания каждые 15 мин (настройки в панели)
+[Timer]
+OnCalendar=*:0/15
+Persistent=true
+RandomizedDelaySec=60
+[Install]
+WantedBy=timers.target
