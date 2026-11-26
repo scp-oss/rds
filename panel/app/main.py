@@ -119,6 +119,10 @@ with db() as c:
     c.execute("alter table users add column if not exists totp_resync text default ''")    # «смещение:шаг» первого кода пары при большом расхождении
     c.execute("create table if not exists admin_log(id bigserial primary key, ts bigint, username text, ip text, action text, target text, ok int default 1)")
     c.execute("create table if not exists tokens(token_sha text primary key, username text, created_at bigint, last_used bigint, client_id text, client_uuid text)")
+    # API-токены панели (☰ → API-токены): в базе только sha256, токен показывается один раз
+    c.execute("""create table if not exists api_tokens(id bigserial primary key, token_sha text unique, prefix text, note text default '',
+        username text, scope text default 'read', created_at bigint, expires_at bigint default 0, last_used bigint default 0,
+        last_ip text default '', created_by text default '')""")
     c.execute("create table if not exists ab(username text primary key, data text, updated_at bigint, auto text default '[]')")
     c.execute("create table if not exists favs(username text, id text, primary key(username, id))")
     c.execute("create table if not exists groups(name text primary key, note text default '', created_at bigint)")
@@ -529,7 +533,31 @@ SESSION_TTL = 12 * 3600
 def make_cookie(user):
     u = get_user(user); ver = int((u["sess_ver"] if u else 0) or 0)
     v = f"{user}|{now() + SESSION_TTL}|{ver}"; return v + "|" + sign("s2|" + v)
+API_TOKEN_PREFIX = "rdsapi_"
+
+def _bearer(req):
+    a = req.headers.get("authorization") or ""
+    t = a[7:].strip() if a[:7].lower() == "bearer " else ""
+    return t if t.startswith(API_TOKEN_PREFIX) else ""
+
+def api_token_user(req, tok):
+    """Вход по API-токену: от имени создавшего администратора; scope read — только GET/HEAD; истёкший — нет."""
+    h = hashlib.sha256(tok.encode()).hexdigest()
+    with db() as c: t = c.execute("select * from api_tokens where token_sha=?", (h,)).fetchone()
+    if not t or (int(t["expires_at"] or 0) and int(t["expires_at"]) < now()): return None
+    if t["scope"] != "write" and req.method not in ("GET", "HEAD"): raise HTTPException(403, "API-токен только для чтения")
+    u = get_user(t["username"])
+    if not u: return None
+    req.state.api_token = {"id": t["id"], "scope": t["scope"], "prefix": t["prefix"]}
+    if now() - int(t["last_used"] or 0) > 60:
+        with db() as c: c.execute("update api_tokens set last_used=?, last_ip=? where id=?", (now(), _ip(req), t["id"]))
+    return u
+
+def via_token(req): return getattr(req.state, "api_token", None)
+
 def session_user(req):
+    tok = _bearer(req)
+    if tok: return api_token_user(req, tok)   # с токеном cookie не используется
     c = req.cookies.get("rds_session", "")
     try:
         u, exp, ver, s = c.rsplit("|", 3)
@@ -561,6 +589,9 @@ def stepup(req, action):
     при настройке admin_2fa_required — администратор без 2FA такие действия выполнить не может. Всё пишется в журнал."""
     u = session_user(req)
     target = req.url.path
+    if via_token(req):
+        admin_log(u["username"], _ip(req), action + " (API-токен " + via_token(req)["prefix"] + "…)", target, 0)
+        raise HTTPException(403, "Это действие требует подтверждения кодом 2FA и по API-токену недоступно")
     if u["totp_on"]:
         if int(u["elev_until"] or 0) < now():
             admin_log(u["username"], _ip(req), action, target, 0)
@@ -1030,6 +1061,9 @@ def user_2fa_reset(name: str, req: Request):
     bump_sessions(name); print(f"[2fa] {name}: сброшена администратором", flush=True); return {"ok": True}
 
 def csrf(req):
+    if _bearer(req):   # Bearer-токен браузер сам не подставляет — CSRF неприменим; сам токен проверяется здесь
+        if session_user(req): return
+        raise HTTPException(401)
     if req.headers.get("x-rds") != "1": raise HTTPException(403)
 
 def hbbs_peers():
@@ -2252,6 +2286,53 @@ def admin_me(req: Request):
     pc = power_cfg()
     return {"username": u["username"], "display_name": u["display_name"] or u["username"], "is_admin": bool(u["is_admin"]), "perms": p, "srv": srv,
             "power": {"shutdown_delay": pc["shutdown_delay"], "reboot_delay": pc["reboot_delay"]}}
+
+@app.get("/admin/api/api-tokens")
+def api_tokens_list(req: Request):
+    admin_only(req)
+    if via_token(req): raise HTTPException(403, "Управление API-токенами — только из панели")
+    with db() as c:
+        rows = [dict(r) for r in c.execute("select id, prefix, note, username, scope, created_at, expires_at, last_used, last_ip, created_by from api_tokens order by id desc")]
+    return {"tokens": rows, "now": now()}
+
+@app.post("/admin/api/api-tokens")
+async def api_tokens_create(req: Request):
+    admin_only(req); csrf(req)
+    if via_token(req): raise HTTPException(403, "Управление API-токенами — только из панели")
+    stepup(req, "создание API-токена"); j = await body_json(req)
+    note = str(j.get("note") or "").strip()[:200]; scope = "write" if j.get("scope") == "write" else "read"
+    try: days = max(0, min(3650, int(j.get("days") or 0)))
+    except (TypeError, ValueError): days = 0
+    with db() as c:
+        if c.execute("select count(*) from api_tokens").fetchone()[0] >= 100: raise HTTPException(400, "Не больше 100 токенов — удалите ненужные")
+    me = session_user(req)["username"]
+    tok = API_TOKEN_PREFIX + base64.urlsafe_b64encode(os.urandom(30)).decode().rstrip("=")
+    with db() as c:
+        c.execute("insert into api_tokens(token_sha, prefix, note, username, scope, created_at, expires_at, created_by) values(?,?,?,?,?,?,?,?)",
+                  (hashlib.sha256(tok.encode()).hexdigest(), tok[:14], note, me, scope, now(), now() + days * 86400 if days else 0, me))
+    admin_log(me, _ip(req), f"создан API-токен {tok[:14]}… ({'чтение и запись' if scope == 'write' else 'только чтение'})", note[:80])
+    return {"token": tok, "prefix": tok[:14], "scope": scope}
+
+@app.post("/admin/api/api-tokens/{i}/note")
+async def api_tokens_note(i: int, req: Request):
+    admin_only(req); csrf(req)
+    if via_token(req): raise HTTPException(403, "Управление API-токенами — только из панели")
+    j = await body_json(req)
+    with db() as c:
+        n = c.execute("update api_tokens set note=? where id=?", (str(j.get("note") or "").strip()[:200], i)).rowcount
+    if not n: raise HTTPException(404)
+    return {"ok": True}
+
+@app.delete("/admin/api/api-tokens/{i}")
+def api_tokens_delete(i: int, req: Request):
+    admin_only(req); csrf(req)
+    if via_token(req): raise HTTPException(403, "Управление API-токенами — только из панели")
+    with db() as c:
+        r = c.execute("select prefix from api_tokens where id=?", (i,)).fetchone()
+        if not r: raise HTTPException(404)
+        c.execute("delete from api_tokens where id=?", (i,))
+    admin_log(session_user(req)["username"], _ip(req), "удалён API-токен", r["prefix"] + "…")
+    return {"ok": True}
 
 @app.get("/admin/api/settings")
 def admin_settings_get(req: Request):
