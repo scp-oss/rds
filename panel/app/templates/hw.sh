@@ -96,6 +96,23 @@ OSA
   else shutdown $F +$MIN "$MSG" >/dev/null 2>&1; fi
   return 0
 }
+# api-server в RustDesk — как в панели (например, после переезда панели): заново применить конфиг сервера, не чаще раза в сутки
+ensure_api() {
+  [ "$(id -u)" = 0 ] || return 0
+  if [ "$(uname -s)" = Darwin ]; then RDB=/Applications/RustDesk.app/Contents/MacOS/RustDesk; CF=/var/root/Library/Preferences/com.carriez.RustDesk/RustDesk2.toml
+  else RDB=$(command -v rustdesk || echo /usr/bin/rustdesk); CF=/root/.config/rustdesk/RustDesk2.toml; fi
+  [ -x "$RDB" ] && [ -f "$CF" ] || return 0
+  CUR=$(sed -n "s/^api-server *= *'\([^']*\)'.*/\1/p" "$CF" | head -1)
+  [ "$CUR" = "$API" ] && return 0
+  SF="$AKDIR/cfg-applied"; NOW=$(date +%s); LAST=0; [ -f "$SF" ] && LAST=$(tr -dc 0-9 < "$SF"); LAST=${LAST:-0}
+  [ $((NOW - LAST)) -ge 86400 ] || return 0
+  mkdir -p "$AKDIR" && echo "$NOW" > "$SF"
+  # служба держит настройки в памяти — после записи конфига её нужно перезапустить
+  if [ "$(uname -s)" = Darwin ]; then HOME=/var/root "$RDB" --config '__CFG__' >/dev/null 2>&1; launchctl kickstart -k system/com.carriez.RustDesk_service >/dev/null 2>&1
+  else "$RDB" --config '__CFG__' >/dev/null 2>&1; systemctl restart rustdesk >/dev/null 2>&1 || service rustdesk restart >/dev/null 2>&1; fi
+  return 0
+}
+ensure_api
 if [ -n "${RD_POLL:-}" ]; then
   ID=$(rd_id); [ -n "$ID" ] || exit 0
   if [ "$(uname -s)" = Darwin ]; then RDV=$(defaults read /Applications/RustDesk.app/Contents/Info CFBundleShortVersionString 2>/dev/null)

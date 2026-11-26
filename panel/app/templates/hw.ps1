@@ -134,6 +134,26 @@ if (-not $id) {
     }
 }
 if (-not $id) { Say 'Could not read RustDesk ID' 'Red'; return }
+# api-server in RustDesk must match the panel (e.g. after the panel moved): re-apply the server config, at most once a day
+if ($AKC -eq 'true') {
+    try {
+        $cf = Join-Path $env:SystemRoot 'ServiceProfiles\LocalService\AppData\Roaming\RustDesk\config\RustDesk2.toml'
+        $cur = $null
+        if (Test-Path $cf) { $m = [regex]::Match([IO.File]::ReadAllText($cf), "(?m)^api-server\s*=\s*'([^']*)'"); $cur = ''; if ($m.Success) { $cur = $m.Groups[1].Value } }
+        if ($cur -ne $null -and $cur -ne $API) {
+            $sf = Join-Path $env:ProgramData 'RustDeskNETH\cfg-applied'
+            $now = [int64](([datetime]::UtcNow - [datetime]'1970-01-01').TotalSeconds); [int64]$last = 0
+            if (Test-Path $sf) { [void][int64]::TryParse(([IO.File]::ReadAllText($sf)).Trim(), [ref]$last) }
+            if ($now - $last -ge 86400) {
+                $d = Split-Path $sf; if (-not (Test-Path $d)) { [void](New-Item -ItemType Directory -Path $d -Force) }
+                [IO.File]::WriteAllText($sf, [string]$now)
+                & $rd --config '__CFG__' | Out-Null
+                # the service keeps settings in memory - restart it to pick up the new config
+                Restart-Service -Name 'RustDesk' -Force -ErrorAction SilentlyContinue
+            }
+        }
+    } catch {}
+}
 if ($Poll) {
     # every 5 min: ask the panel for commands (only "update" for now)
     $rdv = ''; try { $rdv = ([string](Get-Item $rd).VersionInfo.ProductVersion) -replace '[^0-9.]', '' } catch {}

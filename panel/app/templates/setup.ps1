@@ -168,7 +168,7 @@ function Stage-Config {
     $rd = Get-State 'rd'; if (-not $rd) { $rd = Find-Rd }
     if (-not $rd) { Log 'RustDesk not installed'; return 2 }
     Log 'Applying server settings...'
-    $rh = ([Uri]$API).Host
+    $rh = '__RDS__'
     for ($i = 0; $i -lt 20; $i++) {
         & $rd --config $CFG | Out-Null
         if (((& $rd --option custom-rendezvous-server | Out-String).Trim()) -eq $rh) { break }

@@ -50,7 +50,7 @@ sleep 5
 if [ -n "${RD_UPDATE_ONLY:-}" ]; then rm -rf "$T"; echo "RustDesk обновлён: $(defaults read /Applications/RustDesk.app/Contents/Info CFBundleShortVersionString 2>/dev/null)"; exit 0; fi
 
 echo "Настраиваю сервер..."
-RH=${API#https://}; RH=${RH%%/*}
+RH='__RDS__'
 for i in $(seq 1 20); do "$RD" --config "$CFG" >/dev/null 2>&1; [ "$("$RD" --option custom-rendezvous-server 2>/dev/null | tr -d '\r\n')" = "$RH" ] && break; sleep 2; done
 # служба после установки/обновления перезапускается — повторяем, пока RustDesk не подтвердит
 setopt() { for i in $(seq 1 20); do "$RD" --option "$1" "$2" >/dev/null 2>&1; [ "$("$RD" --option "$1" 2>/dev/null | tr -d '\r\n')" = "$2" ] && return 0; sleep 2; done; return 1; }

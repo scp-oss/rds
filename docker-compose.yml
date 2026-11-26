@@ -57,12 +57,13 @@ services:
     restart: unless-stopped
 
   panel:
-    image: ${PANEL_IMAGE:-scposs/rds-panel:1.0.0}
+    image: ${PANEL_IMAGE:-scposs/rds-panel:1.0.1}
     container_name: rds-panel
     environment:
       - RDS_HOST=${RDS_HOST}
       - ADMIN_HOST=${ADMIN_HOST:?задайте ADMIN_HOST в .env}
       - CLIENT_HOST=${CLIENT_HOST:?задайте CLIENT_HOST в .env}
+      - API_URL=${API_URL:-}
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
       - SECRET_KEY=${SECRET_KEY:-}

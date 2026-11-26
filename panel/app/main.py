@@ -14,7 +14,7 @@ E = os.environ.get
 ADMIN_HOST = E("ADMIN_HOST", "rds.example.com")
 CLIENT_HOST = E("CLIENT_HOST", "rd.example.com")
 RDS_HOST = E("RDS_HOST", "rds.example.com")          # ID/relay сервер для клиентов (стандартные порты)
-API_URL = E("API_URL", f"https://{ADMIN_HOST}")       # api-server в клиентах
+API_URL = E("API_URL") or f"https://{ADMIN_HOST}"    # api-server в клиентах (другой адрес — если админка не на 443, напр. через CLIENT_HOST)
 CLIENT_URL = E("CLIENT_URL", f"https://{CLIENT_HOST}")
 ADMIN_USER = E("ADMIN_USER", "admin")
 ADMIN_PASSWORD = E("ADMIN_PASSWORD", "")
@@ -332,7 +332,7 @@ HWV_UNIX = _collector_ver("hw.sh")
 
 def render(name, master, base=None, login_token="", login_user=""):
     s = (TPL / name).read_text(encoding="utf-8")
-    for k, v in {"__LOGIN_TOKEN__": login_token, "__LOGIN_USER__": login_user, "__CFG__": config_string(), "__API__": API_URL, "__TOKEN__": REG_TOKEN, "__BASE__": base or CLIENT_URL,
+    for k, v in {"__LOGIN_TOKEN__": login_token, "__LOGIN_USER__": login_user, "__CFG__": config_string(), "__API__": API_URL, "__RDS__": RDS_HOST, "__TOKEN__": REG_TOKEN, "__BASE__": base or CLIENT_URL,
                  "__MASTER__": ("$true" if master else "$false") if name.endswith(".ps1") else ("1" if master else "0"),
                  "__Q__": "" if master else "?master=0",
                  "__HWV__": HWV_WIN if name.endswith(".ps1") else HWV_UNIX,

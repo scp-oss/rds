@@ -7,7 +7,7 @@ RD=/usr/bin/rustdesk
 systemctl start rustdesk 2>/dev/null || true
 ID=""
 for i in $(seq 1 30); do ID=$("$RD" --get-id 2>/dev/null | tr -dc 0-9); [ -n "$ID" ] && break; sleep 2; done
-RH=${API#https://}; RH=${RH%%/*}
+RH='__RDS__'
 for i in $(seq 1 20); do "$RD" --config "$CFG" >/dev/null 2>&1; [ "$("$RD" --option custom-rendezvous-server 2>/dev/null | tr -d '\r\n')" = "$RH" ] && break; sleep 2; done
 # служба после установки/обновления перезапускается — повторяем, пока RustDesk не подтвердит
 setopt() { for i in $(seq 1 20); do "$RD" --option "$1" "$2" >/dev/null 2>&1; [ "$("$RD" --option "$1" 2>/dev/null | tr -d '\r\n')" = "$2" ] && return 0; sleep 2; done; return 1; }
